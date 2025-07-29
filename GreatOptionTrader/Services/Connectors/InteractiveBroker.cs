@@ -1,64 +1,43 @@
-﻿using GreatOptionTrader.Converters;
+﻿using GreatOptionTrader.Abstractions;
 using GreatOptionTrader.DTO;
 using GreatOptionTrader.Models;
 using GreatOptionTrader.Services.Repositories;
 using IBApi;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.ObjectModel;
 using System.Threading;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Controls;
+using GreatOptionTrader.Services.Converters;
 
 namespace GreatOptionTrader.Services.Connectors;
+
+public delegate void ItemRequestedEventHandler<TItem> (int requestId, TItem item);
+
 public class InteractiveBroker {
-    private class IbWrapper (
-        ObservableCollection<Instrument> cache, 
-        ILogger<InteractiveBroker> logger) : DefaultEWrapper {
-
-        public event Action<Instrument> OnContractDetailsRequested = delegate { };
-
-        public override void error (int id, int errorCode, string errorMsg, string advancedOrderRejectJson) {
-            logger.LogError("{id}: {errorCode}: {message}", id, errorCode, errorMsg);
-        }
-        public override void error (string str) => logger.LogCritical("{message}", str);
-        public override void error (Exception e) => logger.LogCritical("{message}", e.Message);
-        public override void contractDetails (int reqId, ContractDetails contractDetails) {
-            OnContractDetailsRequested.Invoke(contractDetails.ToInstrument());
-        }
-        public override void tickPrice (int tickerId, int field, double price, TickAttrib attribs) {
-            switch (field) {
-                case TickType.ASK:
-                case TickType.DELAYED_ASK:
-                    cache[tickerId].Ask = price;
-                    break;
-                case TickType.BID:
-                case TickType.DELAYED_BID:
-                    cache[tickerId].Bid = price;
-                    break;
-            }
-        }
-    }
-
+    
     private readonly IbWrapper wrapper;
     private readonly EReaderMonitorSignal monitor;
     private readonly EClientSocket socket;
 
-    public InstrumentRepository InstrumentRepository { get; }
+    private readonly List<IPriceable<double>> instrumentCache;
 
     public InteractiveBroker(
-        InstrumentRepository instrumentRepository,
         ILogger<InteractiveBroker> logger) {
-        wrapper = new IbWrapper(instrumentRepository.Items, logger);
+        instrumentCache = new(100);
+        wrapper = new IbWrapper(instrumentCache, logger);
         monitor = new EReaderMonitorSignal();
         socket = new EClientSocket(wrapper, monitor);
 
-        InstrumentRepository = instrumentRepository;
     }
 
-    public event Action<Instrument> OnContractDetailsRequested {
+    public event ItemRequestedEventHandler<Instrument> OnContractDetailsRequested {
         add => wrapper.OnContractDetailsRequested += value;
         remove => wrapper.OnContractDetailsRequested -= value;
     }
 
+    public IEnumerable<string> Accounts => wrapper.Accounts ?? [];
     public bool IsConnected () => socket.IsConnected();
 
     public void Connect (int clientId, string host = "127.0.0.1", int port = 7497) {
@@ -82,6 +61,16 @@ public class InteractiveBroker {
         }
     }
 
+    public void RequestOption(int requestId, string optionName, string otpionExchange) {
+        var contract = new Contract() {
+            LocalSymbol = optionName.Trim().ToUpper(),
+            Exchange = otpionExchange.Trim().ToUpper(),
+            SecType = "FOP"
+        };
+
+        socket.reqContractDetails(requestId, contract);
+    }
+
     public void RequestOptions(int requestId, InstrumentRequestDTO request) {
         if (string.IsNullOrEmpty(request.InstrumentName) ||
             string.IsNullOrEmpty(request.InstrumentExchange)) {
@@ -103,8 +92,23 @@ public class InteractiveBroker {
         }
     }
 
-    public void AddInstrumentToCache (Instrument instrument) {
-        var tickerId = InstrumentRepository.Create(instrument);
-        socket.reqMktData(tickerId, instrument.ToIbContract(), string.Empty, false, false, null);
+    public void AddInstrumentToCache (IPriceable<double> instrument) {
+        int ticker = instrumentCache.Count;
+        if (instrumentCache.Any(i => i.Instrument.Id == instrument.Instrument.Id)) {
+            return;
+        }
+
+        instrumentCache.Add(instrument);
+        
+        socket.reqMktData(
+            ticker, 
+            instrument.Instrument.ToIbContract(),
+            string.Empty, false, false, null);
+    }
+
+    public int GetValidOrderId () => wrapper.ValidOrderId++;
+
+    public void PlaceOrder(Instrument instrument, Models.Order order) {
+        socket.placeOrder(order.OrderId, instrument.ToIbContract(), order.ToIbOrder());
     }
 }

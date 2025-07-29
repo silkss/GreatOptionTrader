@@ -2,15 +2,22 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:GreatOptionTrader"
+             xmlns:vm="clr-namespace:GreatOptionTrader.ViewModels"
              xmlns:models="clr-namespace:GreatOptionTrader.Models"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:enums="clr-namespace:GreatOptionTrader.Types"
              >
     <Application.Resources>
         <Thickness x:Key="BaseMargin" Left="4" Top="4" Right="4" Bottom="4"/>
+        
         <Style TargetType="TextBlock" x:Key="BaseTextBlockStyle">
             <Setter Property="Margin" Value="{StaticResource BaseMargin}"/>
         </Style>
+        
         <Style TargetType="TextBox" x:Key="BaseTextBoxStyle">
             <Setter Property="Margin" Value="{StaticResource BaseMargin}"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="BorderThickness" Value="0,0,0,2"/>
         </Style>
         <Style TargetType="Button" x:Key="BaseButtonStyle">
@@ -30,6 +37,19 @@
             <Setter Property="Margin" Value="{StaticResource BaseMargin}"/>
         </Style>
 
+        <Style x:Key="BaseComboBoxItemStyle" TargetType="ComboBoxItem">
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        
+        <ObjectDataProvider 
+            x:Key="TradeDirectionToItemSource" MethodName="GetValues" 
+            ObjectType="{x:Type system:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="enums:TradeDirection"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        
         <DataTemplate DataType="{x:Type models:Instrument}" x:Key="BaseInsturmentInfo">
             <UniformGrid Columns="1">
                 <UniformGrid Rows="1">
@@ -43,6 +63,36 @@
                 <UniformGrid Rows="1">
                     <TextBlock Text="multiplier:" Style="{StaticResource BaseTextBlockStyle}" />
                     <TextBlock Text="{Binding Multiplier}" Style="{StaticResource BaseTextBlockStyle}"/>
+                </UniformGrid>
+            </UniformGrid>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:GroupViewModel}">
+            <UniformGrid Rows="1">
+                <TextBlock Text="{Binding Group.Id}" Style="{StaticResource BaseTextBlockStyle}"/>
+                <TextBlock Text="{Binding Group.Name}" Style="{StaticResource BaseTextBlockStyle}"/>
+            </UniformGrid>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:InstrumentViewModel}">
+            <UniformGrid Rows="1">
+                <TextBlock 
+                    Text="{Binding Instrument.Name}"
+                    Style="{StaticResource BaseTextBlockStyle}"/>
+                
+                <UniformGrid Rows="1">
+                    <TextBlock 
+                        TextAlignment="Left"
+                        Text="{Binding BidPrice}"
+                        Style="{StaticResource BaseTextBlockStyle}"/>
+                    <TextBlock
+                        TextAlignment="Center"
+                        Text="{Binding LastPrice}" 
+                        Style="{StaticResource BaseTextBlockStyle}"/>
+                    <TextBlock
+                        TextAlignment="Right"
+                        Text="{Binding AskPrice}"
+                        Style="{StaticResource BaseTextBlockStyle}"/>
                 </UniformGrid>
             </UniformGrid>
         </DataTemplate>

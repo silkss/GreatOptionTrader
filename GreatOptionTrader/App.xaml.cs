@@ -4,6 +4,7 @@ using GreatOptionTrader.Services.Connectors;
 using Microsoft.Extensions.Logging;
 using System.Windows;
 using GreatOptionTrader.Services.Repositories;
+using System.Threading.Tasks;
 
 namespace GreatOptionTrader;
 
@@ -12,19 +13,19 @@ namespace GreatOptionTrader;
 /// </summary>
 public partial class App : Application {
     private readonly InteractiveBroker broker;
-    private readonly InstrumentGroupRepo instrumentGroupRepository;
+    private readonly InstrumentGroupRepository instrumentGroupRepository;
     private readonly InstrumentRepository instrumentRepository;
     private readonly ILoggerFactory loggerFactory;
 
     public App () {
         loggerFactory = LoggerFactory.Create(b => b.AddDebug());
-
-        instrumentGroupRepository = new(Dispatcher);
-        instrumentRepository = new(Dispatcher);
+        instrumentRepository = new();
 
         broker = new InteractiveBroker(
-            instrumentRepository,
             loggerFactory.CreateLogger<InteractiveBroker>());
+
+        instrumentGroupRepository = new(Dispatcher, broker, instrumentRepository);
+
     }
 
     protected override void OnStartup (StartupEventArgs e) {
@@ -38,7 +39,7 @@ public partial class App : Application {
     }
 
     protected override void OnExit (ExitEventArgs e) {
-        broker.Disconnect();
+        //broker.Disconnect();
         base.OnExit(e);
     }
 }

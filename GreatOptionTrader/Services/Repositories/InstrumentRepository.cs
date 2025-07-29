@@ -1,22 +1,19 @@
 ﻿using GreatOptionTrader.Models;
-using System.Collections.ObjectModel;
-using System.Windows.Threading;
 
 namespace GreatOptionTrader.Services.Repositories;
 public class InstrumentRepository {
-    private readonly Dispatcher dispatcher;
-
-    public InstrumentRepository(Dispatcher dispatcher) {
-        Items = new();
-        this.dispatcher = dispatcher;
-    }
-
-    public ObservableCollection<Instrument> Items { get; }
-    public int Create(Instrument instrument) {
-        int tickerId = Items.Count;
-        dispatcher.Invoke(() => {
-            Items.Add(instrument);
-        });
-        return tickerId;
+    public void Add(Instrument instrument) {
+        using (var db = new GOTContext()) {
+            if (db.Instruments == null) {
+                return;
+            }
+            try {
+                db.Instruments.Add(instrument);
+                db.SaveChanges();
+            } 
+            catch (System.InvalidOperationException) {
+                //TODO: Оповестить об ошибки!
+            }
+        }
     }
 }

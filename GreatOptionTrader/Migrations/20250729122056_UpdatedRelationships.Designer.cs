@@ -3,6 +3,7 @@ using System;
 using GreatOptionTrader.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GreatOptionTrader.Migrations
 {
     [DbContext(typeof(GOTContext))]
-    partial class GOTContextModelSnapshot : ModelSnapshot
+    [Migration("20250729122056_UpdatedRelationships")]
+    partial class UpdatedRelationships
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.7");
@@ -71,11 +74,11 @@ namespace GreatOptionTrader.Migrations
 
             modelBuilder.Entity("GreatOptionTrader.Models.Instrument", b =>
                 {
-                    b.HasOne("GreatOptionTrader.Models.InstrumentGroup", null)
+                    b.HasOne("GreatOptionTrader.Models.InstrumentGroup", "Group")
                         .WithMany("Instruments")
-                        .HasForeignKey("InstrumentGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("InstrumentGroupId");
+
+                    b.Navigation("Group");
                 });
 
             modelBuilder.Entity("GreatOptionTrader.Models.InstrumentGroup", b =>

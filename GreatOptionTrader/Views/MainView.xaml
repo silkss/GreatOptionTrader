@@ -4,15 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GreatOptionTrader"
-        xmlns:dtos="clr-namespace:GreatOptionTrader.DTO"
-        xmlns:convs="clr-namespace:GreatOptionTrader.Converters"
         
         mc:Ignorable="d"
         Title="Greate Option Trader" Height="450" Width="800">
-    <Window.Resources>
-        <convs:InstrumentToGroupDTOConverter x:Key="InstrumentToGroupDTOConverter"/>
-    </Window.Resources>
-
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="Connector">
@@ -23,89 +17,90 @@
             </MenuItem>
         </Menu>
         <Grid DockPanel.Dock="Bottom">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="42"/>
+                <RowDefinition/>
+                <RowDefinition Height="42"/>
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="3*"/>
             </Grid.ColumnDefinitions>
-            <DataGrid 
-                IsReadOnly="True"
-                x:Name="dgInstrumentGroups"
-                AutoGenerateColumns="False"
-                ItemsSource="{Binding Groups}"
-                Grid.Column="0">
-                <DataGrid.Columns>
-                    
-                    <DataGridTextColumn
-                        Header="id"
-                        Width="0.5*"
-                        Binding="{Binding Id}"/>
-                    
-                    <DataGridTextColumn 
-                        Header="name"
-                        Width="1*"
-                        Binding="{Binding Name}"/>
-                    
-                </DataGrid.Columns>
-            </DataGrid>
-            <Grid Grid.Column="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition Height="42"/>
-                </Grid.RowDefinitions>
-                <DataGrid
-                    Grid.Column="1"
-                    ItemsSource="{Binding Instruments}"
-                    IsReadOnly="True"
-                    AutoGenerateColumns="False">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn
-                            Header="name"
-                            Binding="{Binding Name}"
-                            Width="1*"/>
-                        <DataGridTextColumn
-                            Header="expiration"
-                            Binding="{Binding ExpirationDate, StringFormat=D, ConverterCulture=RU-ru}"
-                            Width="1*"/>
-                        <DataGridTextColumn
-                            Header="bid"
-                            Binding="{Binding Bid}"
-                            Width=".5*"/>
-                        <DataGridTextColumn
-                            Header="ask"
-                            Binding="{Binding Ask}"
-                            Width=".5*"/>
-                    </DataGrid.Columns>
-                </DataGrid>
 
-                <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <TextBox
-                        Grid.Column="0"
-                        Style="{StaticResource BaseTextBoxStyle}"
-                        x:Name="tbName"/>
-                    <TextBox 
-                        Grid.Column="1"
-                        Style="{StaticResource BaseTextBoxStyle}"
-                        x:Name="tbExchange"/>
-                    <Button
-                        Grid.Column="2"
-                        Style="{StaticResource BaseButtonStyle}"
-                        Command="{Binding AddInstrumentToGroup}"
-                        Content="add">
-                        <Button.CommandParameter>
-                            <MultiBinding Converter="{StaticResource InstrumentToGroupDTOConverter}">
-                                <Binding ElementName="dgInstrumentGroups" Path="SelectedItem"/>
-                                <Binding ElementName="tbName" Path="Text"/>
-                                <Binding ElementName="tbExchange" Path="Text"/>
-                            </MultiBinding>
-                        </Button.CommandParameter>
-                    </Button>
-                </Grid>
+            <StackPanel 
+                Orientation="Horizontal"
+                Grid.Row="0"
+                Grid.Column="0">
+                <Button 
+                    Width="34"
+                    Content="->"
+                    Style="{StaticResource BaseButtonStyle}"
+                    Command="{Binding StartGroupCommand}"
+                    CommandParameter="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem}"/>
+            </StackPanel>
+            <ListView
+                Grid.Column="0"
+                Grid.Row="1"
+                x:Name="dgInstrumentGroups"
+                ItemsSource="{Binding Groups}"/>
+
+            <UniformGrid 
+                Rows="1"
+                Grid.Row="0"
+                Grid.Column="1">
+                <ComboBox
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Margin="{StaticResource BaseMargin}"
+                    ItemContainerStyle="{StaticResource BaseComboBoxItemStyle}"
+                    ItemsSource="{Binding Source={StaticResource TradeDirectionToItemSource}}"
+                    SelectedItem="{Binding ElementName=lvInstruments, Path=SelectedItem.WantedDirection}"/>
+
+                <TextBox
+                    Style="{StaticResource BaseTextBoxStyle}"
+                    Text="{Binding ElementName=lvInstruments, Path=SelectedItem.WantedVolume, Mode=TwoWay}"/>
+                
+                <TextBox
+                    Style="{StaticResource BaseTextBoxStyle}"
+                    Text="{Binding ElementName=lvInstruments, Path=SelectedItem.WantedPrice, Mode=TwoWay}"/>
+
+                <Button
+                    Style="{StaticResource BaseButtonStyle}"
+                    Command="{Binding SendOrderCommand}"
+                    CommandParameter="{Binding ElementName=lvInstruments, Path=SelectedItem}"
+                    Content="SendOrder"/>
+                
+            </UniformGrid>
+            <ListView
+                x:Name="lvInstruments"
+                Grid.Column="1"
+                Grid.Row="1"
+                ItemsSource="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem.Instruments}"/>
+                
+            <Grid Grid.Row="2"
+                  Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBox
+                    Grid.Column="0"
+                    Style="{StaticResource BaseTextBoxStyle}"
+                    Text="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem.RequestedOptionName}"/>
+
+                <TextBox 
+                    Grid.Column="1"
+                    Style="{StaticResource BaseTextBoxStyle}"
+                    Text="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem.RequestedOptionExchange}"/>
+
+                <Button
+                    Grid.Column="2"
+                    Content="Request"
+                    Command="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem.RequestOptionCommand}"
+                    Style="{StaticResource BaseButtonStyle}"/>
             </Grid>
+
         </Grid>
     </DockPanel>
 </Window>

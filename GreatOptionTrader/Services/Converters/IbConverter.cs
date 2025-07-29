@@ -3,7 +3,8 @@ using IBApi;
 using System;
 using System.Globalization;
 
-namespace GreatOptionTrader.Converters;
+namespace GreatOptionTrader.Services.Converters;
+
 internal static class IbConverter {
     public static DateTime ToDateTime (this string ibDateTime) =>
         DateTime.ParseExact(ibDateTime, "yyyyMMdd", CultureInfo.InvariantCulture);
@@ -24,7 +25,18 @@ internal static class IbConverter {
         return new Contract() {
             ConId = instrument.Id,
             LocalSymbol = instrument.Name,
+            Symbol = instrument.Symbol,
             Exchange = instrument.Exchange
+        };
+    }
+
+    public static IBApi.Order ToIbOrder(this Models.Order order) {
+        return new IBApi.Order() {
+            LmtPrice = order.LimitPrice,
+            TotalQuantity = order.Volume,
+            OrderType = "LMT",
+            Action = order.Direction == Types.TradeDirection.Buy ? "BUY" : "SELL",
+            Tif = "GTC",
         };
     }
 }

@@ -16,4 +16,12 @@ public class GOTContext : DbContext {
 
     protected override void OnConfiguring (DbContextOptionsBuilder options)
         => options.UseSqlite($"Data Source={DbPath}");
+
+    protected override void OnModelCreating (ModelBuilder modelBuilder) {
+        modelBuilder.Entity<InstrumentGroup>()
+            .HasMany(e => e.Instruments)
+            .WithOne()
+            .HasForeignKey(e => e.InstrumentGroupId)
+            .IsRequired();
+    }
 }

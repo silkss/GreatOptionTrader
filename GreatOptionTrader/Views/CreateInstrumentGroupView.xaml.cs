@@ -6,9 +6,9 @@ namespace GreatOptionTrader.Views;
 /// Логика взаимодействия для CreateInstrumentGroupView.xaml
 /// </summary>
 public partial class CreateInstrumentGroupView : Window {
-    private readonly InstrumentGroupRepo repository;
+    private readonly InstrumentGroupRepository repository;
 
-    public CreateInstrumentGroupView (InstrumentGroupRepo repository) {
+    public CreateInstrumentGroupView (InstrumentGroupRepository repository) {
         InitializeComponent();
         this.repository = repository;
     }
