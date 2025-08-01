@@ -27,10 +27,8 @@
                 <ColumnDefinition Width="3*"/>
             </Grid.ColumnDefinitions>
 
-            <StackPanel 
-                Orientation="Horizontal"
-                Grid.Row="0"
-                Grid.Column="0">
+            <StackPanel Grid.Row="0" Grid.Column="0"
+                Orientation="Horizontal">
                 <Button 
                     Width="34"
                     Content="->"
@@ -38,21 +36,22 @@
                     Command="{Binding StartGroupCommand}"
                     CommandParameter="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem}"/>
             </StackPanel>
-            <ListView
+          
+            <ListView x:Name="dgInstrumentGroups"
                 Grid.Column="0"
                 Grid.Row="1"
-                x:Name="dgInstrumentGroups"
                 ItemsSource="{Binding Groups}"/>
 
-            <UniformGrid 
-                Rows="1"
-                Grid.Row="0"
-                Grid.Column="1">
+            <UniformGrid Grid.Row="0" Grid.Column="1"
+                Rows="1">
+
+                <ComboBox 
+                    Style="{StaticResource BaseComboBoxStyle}"
+                    ItemsSource="{Binding Accounts}"
+                    SelectedItem="{Binding ElementName=lvInstruments, Path=SelectedItem.WantedAccount}"/>
+
                 <ComboBox
-                    HorizontalContentAlignment="Center"
-                    VerticalContentAlignment="Center"
-                    Margin="{StaticResource BaseMargin}"
-                    ItemContainerStyle="{StaticResource BaseComboBoxItemStyle}"
+                    Style="{StaticResource BaseComboBoxStyle}"
                     ItemsSource="{Binding Source={StaticResource TradeDirectionToItemSource}}"
                     SelectedItem="{Binding ElementName=lvInstruments, Path=SelectedItem.WantedDirection}"/>
 
@@ -71,8 +70,8 @@
                     Content="SendOrder"/>
                 
             </UniformGrid>
-            <ListView
-                x:Name="lvInstruments"
+            
+            <ListView x:Name="lvInstruments"
                 Grid.Column="1"
                 Grid.Row="1"
                 ItemsSource="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem.Instruments}"/>
@@ -97,7 +96,8 @@
                 <Button
                     Grid.Column="2"
                     Content="Request"
-                    Command="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem.RequestOptionCommand}"
+                    Command="{Binding RequestOptionCommand}"
+                    CommandParameter="{Binding ElementName=dgInstrumentGroups,Path=SelectedItem}"
                     Style="{StaticResource BaseButtonStyle}"/>
             </Grid>
 

@@ -2,6 +2,7 @@
 using GreatOptionTrader.Services.Connectors;
 using GreatOptionTrader.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations.Operations.Builders;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -12,22 +13,37 @@ public class InstrumentGroupRepository {
     private readonly Dispatcher dispatcher;
     private readonly InteractiveBroker broker;
     private readonly InstrumentRepository instrumentRepository;
+    private readonly OrdersRepository ordersRepository;
 
-    public InstrumentGroupRepository(Dispatcher dispatcher, InteractiveBroker broker, InstrumentRepository instrumentRepository) {
+    private GroupViewModel createGroupView(InstrumentGroup group) {
+        return new GroupViewModel(
+            group: group,
+            broker: broker,
+            instrumentRepository: instrumentRepository,
+            ordersRepository: ordersRepository,
+            dispatcher: dispatcher);
+    }
+
+    public InstrumentGroupRepository(
+        Dispatcher dispatcher, 
+        InteractiveBroker broker,
+        InstrumentRepository instrumentRepository,
+        OrdersRepository ordersRepository) {
         this.dispatcher = dispatcher;
         this.broker = broker;
         this.instrumentRepository = instrumentRepository;
+        this.ordersRepository = ordersRepository;
         List<InstrumentGroup> items;
 
         using (var db = new GOTContext()) {
             items = db
                 .InstrumentGroups? 
                 .Include(group => group.Instruments)
+                .ThenInclude(sec => sec.Orders)
                 .ToList() ?? [];
         }
 
-        Items = new ObservableCollection<GroupViewModel>(
-            items.Select(item => new GroupViewModel(item, broker, instrumentRepository, dispatcher)));
+        Items = new ObservableCollection<GroupViewModel>(items.Select(createGroupView));
     }
 
     public ObservableCollection<GroupViewModel> Items { get; }
@@ -41,7 +57,7 @@ public class InstrumentGroupRepository {
             db.SaveChanges();
         }
 
-        dispatcher.Invoke(() => Items.Add(new GroupViewModel(item, broker, instrumentRepository, dispatcher)));
+        dispatcher.Invoke(() => Items.Add(createGroupView(item)));
     }
 
     public void CreateByName(string name) {

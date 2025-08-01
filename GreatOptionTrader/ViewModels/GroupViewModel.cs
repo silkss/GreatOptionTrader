@@ -1,5 +1,4 @@
-﻿using GreatOptionTrader.Commands;
-using GreatOptionTrader.Commands.Base;
+﻿using GreatOptionTrader.Commands.Base;
 using GreatOptionTrader.Models;
 using GreatOptionTrader.Services.Connectors;
 using GreatOptionTrader.Services.Repositories;
@@ -12,23 +11,32 @@ namespace GreatOptionTrader.ViewModels;
 public class GroupViewModel : Base.ObservableObject {
     private readonly InteractiveBroker broker;
     private readonly InstrumentRepository instrumentRepository;
+    private readonly OrdersRepository ordersRepository;
     private readonly Dispatcher dispatcher;
     private string? requestedOptionName;
     private string? requestedOptionExchange;
 
-    public GroupViewModel(
-        InstrumentGroup group, 
-        InteractiveBroker broker, 
+    private InstrumentViewModel createInstrumentViewModel(Instrument instrument) {
+        return new InstrumentViewModel(
+            instrument: instrument,
+            ordersRepository: ordersRepository,
+            broker: broker);
+    }
+
+    public GroupViewModel (
+        InstrumentGroup group,
+        InteractiveBroker broker,
         InstrumentRepository instrumentRepository,
+        OrdersRepository ordersRepository,
         Dispatcher dispatcher) {
         this.dispatcher = dispatcher;
         this.Group = group;
         this.broker = broker;
         this.instrumentRepository = instrumentRepository;
-        this.Instruments = new ObservableCollection<InstrumentViewModel>(group.Instruments.Select(item => new InstrumentViewModel(item)));
+        this.ordersRepository = ordersRepository;
+        this.Instruments = new ObservableCollection<InstrumentViewModel>(group.Instruments.Select(createInstrumentViewModel));
         this.RequestOptionCommand = new LambdaCommand(onRequestOptionCommand, canRequestOptionCommand);
-        this.broker.OnContractDetailsRequested += OnInstrumentRequested;
-
+        this.broker.ContractUpdated += OnInstrumentUpdated;
     }
     public bool IsStarted { get; set; }
     public InstrumentGroup Group { get; }
@@ -53,7 +61,7 @@ public class GroupViewModel : Base.ObservableObject {
         }
     }
     
-    public void OnInstrumentRequested(int requestId, Instrument option) {
+    public void OnInstrumentUpdated(int requestId, Instrument option) {
         if (requestId != Group.Id) {
             return;
         }
@@ -66,7 +74,7 @@ public class GroupViewModel : Base.ObservableObject {
 
         instrumentRepository.Add(option);
 
-        dispatcher.Invoke(() => Instruments.Add(new InstrumentViewModel(option)));
+        dispatcher.Invoke(() => Instruments.Add(createInstrumentViewModel(option)));
     }
 
     #region RequestOptionCommand

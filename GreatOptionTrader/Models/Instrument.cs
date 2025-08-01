@@ -13,4 +13,6 @@ public class Instrument {
     public double Strike { get; init; }
 
     public int InstrumentGroupId { get; set; }
+
+    public List<Core.Order> Orders { get; set; } = [];
 }

@@ -5,17 +5,25 @@ using System;
 using System.Collections.Generic;
 using GreatOptionTrader.Abstractions;
 using GreatOptionTrader.Services.Converters;
+using GreatOptionTrader.EventArguments;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
+using System.Windows.Threading;
 
 namespace GreatOptionTrader.Services.Connectors;
 
 internal class IbWrapper (
         List<IPriceable<double>> instrumentCache,
-        ILogger<InteractiveBroker> logger) : DefaultEWrapper {
+        ILogger<InteractiveBroker> logger,
+        ObservableCollection<string> accounts,
+        Dispatcher dispatcher) : DefaultEWrapper, INotifyPropertyChanged  {
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-    public string[]? Accounts;
     public int ValidOrderId;
 
-    public event ItemRequestedEventHandler<Instrument> OnContractDetailsRequested = delegate { };
+    public event ItemUpdatedEvent<Instrument> ContractUpdated = delegate { };
+    public event ItemUpdatedEvent<OrderStatusEventArgument> OrderStatusUpdated = delegate { };
+    public event ItemUpdatedEvent<CommissionUpdateEventArgs> CommissionUpdated = delegate { };
 
     public override void error (int id, int errorCode, string errorMsg, string advancedOrderRejectJson) {
         logger.LogError("{id}: {errorCode}: {message}", id, errorCode, errorMsg);
@@ -25,11 +33,14 @@ internal class IbWrapper (
     
     public override void error (Exception e) => logger.LogCritical("{message}", e.Message);
     
-    public override void contractDetails (int reqId, ContractDetails contractDetails) {
-        OnContractDetailsRequested.Invoke(reqId, contractDetails.ToInstrument());
-    }
+    public override void contractDetails (int reqId, ContractDetails contractDetails) =>
+        ContractUpdated.Invoke(reqId, contractDetails.ToInstrument());
 
-    public override void managedAccounts (string accountsList) => Accounts = accountsList.Split(",");
+    public override void managedAccounts (string accountsList) {
+        foreach (var account in accountsList.Split(",")) {
+            dispatcher.Invoke(() => accounts.Add(account));
+        }
+    }
 
     public override void nextValidId (int orderId) => ValidOrderId = orderId;
 
@@ -64,14 +75,35 @@ internal class IbWrapper (
         int clientId,
         string whyHeld, 
         double mktCapPrice) {
-        
+        var arg = new OrderStatusEventArgument() {
+            AverageFilledPrice = avgFillPrice == double.MaxValue ? 0m : (decimal)avgFillPrice,
+            Status = status.ToOrderStatus(),
+            FilledVolume = filled
+        };
+
+        OrderStatusUpdated.Invoke(orderId, arg);
     }
+
 
     public override void openOrder (
         int orderId, 
         Contract contract, 
         IBApi.Order order, 
         OrderState orderState) {
-        
+        CommissionUpdateEventArgs args;
+        if (orderState.Commission == double.MaxValue || orderState.Commission <= 0.0) {
+            args = new CommissionUpdateEventArgs() {
+                Commission = 0.0m,
+                PermId = order.PermId
+            };
+            CommissionUpdated.Invoke(orderId, args);
+            return;
+        }
+
+        args = new CommissionUpdateEventArgs() {
+            Commission = (decimal)orderState.Commission,
+            PermId = order.PermId
+        };
+        CommissionUpdated.Invoke(orderId, args);
     }
 }

@@ -1,4 +1,5 @@
-﻿using GreatOptionTrader.Models;
+﻿using Core;
+using GreatOptionTrader.Models;
 using IBApi;
 using System;
 using System.Globalization;
@@ -21,22 +22,31 @@ internal static class IbConverter {
         };
     }
 
-    public static Contract ToIbContract(this Instrument instrument) {
-        return new Contract() {
-            ConId = instrument.Id,
-            LocalSymbol = instrument.Name,
-            Symbol = instrument.Symbol,
-            Exchange = instrument.Exchange
-        };
-    }
+    public static Contract ToIBContract (this Instrument instrument) => new() {
+        ConId = instrument.Id,
+        Exchange = instrument.Exchange,
+        LastTradeDateOrContractMonth = instrument.ExpirationDate.ToString("yyyyMMdd")
+    };
 
-    public static IBApi.Order ToIbOrder(this Models.Order order) {
-        return new IBApi.Order() {
-            LmtPrice = order.LimitPrice,
-            TotalQuantity = order.Volume,
-            OrderType = "LMT",
-            Action = order.Direction == Types.TradeDirection.Buy ? "BUY" : "SELL",
-            Tif = "GTC",
-        };
-    }
+    public static IBApi.Order ToIBLimitOrder (this Core.Order order) => new() {
+        Account = order.Account,
+        OrderId = order.OrderId,
+        TotalQuantity = order.Quantity,
+        Action = order.Direction == TradeDirection.Buy ? "BUY" : "SELL",
+        LmtPrice = (double)order.LimitPrice,
+        OrderType = "LMT",
+        Tif = "GTC"
+    };
+
+    public static OrderStatus ToOrderStatus (this string status) => status switch {
+        "PendingSubmit" => OrderStatus.PendingSubmit,
+        "PendingCancel" => OrderStatus.PendingSubmit,
+        "PreSubmitted" => OrderStatus.PreSubmitted,
+        "Submitted" => OrderStatus.Submitted,
+        "ApiCancelled" => OrderStatus.ApiCancelled,
+        "Cancelled" => OrderStatus.Cancelled,
+        "Filled" => OrderStatus.Filled,
+        "Inactive" => OrderStatus.Inactive,
+        _ => throw new NotSupportedException($"Unsupported order status {status}")
+    };
 }

@@ -1,12 +1,12 @@
-﻿using GreatOptionTrader.Models;
-using GreatOptionTrader.Services.Connectors;
+﻿using GreatOptionTrader.Services.Connectors;
 using GreatOptionTrader.ViewModels;
+using System;
 
 namespace GreatOptionTrader.Commands;
 public class SendOrderCommand (InteractiveBroker broker) : Base.Command {
     public override bool CanExecute (object? parameter) => broker.IsConnected()
         && parameter is InstrumentViewModel ivm
-        && ivm.WantedPrice > 0.0
+        && ivm.WantedPrice > 0m
         && ivm.WantedVolume > 0m;
 
     public override void Execute (object? parameter) {
@@ -14,13 +14,22 @@ public class SendOrderCommand (InteractiveBroker broker) : Base.Command {
             return;
         }
 
-        var order = new Order() {
+        if (ivm.WantedAccount == null) {
+            return;
+        }
+
+        var order = new Core.Order() {
+            CreatedTime = DateTime.Now,
             Direction = ivm.WantedDirection,
             LimitPrice = ivm.WantedPrice,
-            Volume = ivm.WantedVolume,
-            OrderId = broker.GetValidOrderId()
+            Account = ivm.WantedAccount,
+            Quantity = ivm.WantedVolume,
+            OrderId = broker.GetValidOrderId(),
+            InstrumentId = ivm.Instrument.Id
         };
 
+        ivm.AddOrder(order);
+        
         broker.PlaceOrder(ivm.Instrument, order);
     }
 }

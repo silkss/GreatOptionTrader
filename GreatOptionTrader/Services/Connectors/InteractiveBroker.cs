@@ -1,22 +1,19 @@
 ﻿using GreatOptionTrader.Abstractions;
 using GreatOptionTrader.DTO;
+using GreatOptionTrader.EventArguments;
 using GreatOptionTrader.Models;
-using GreatOptionTrader.Services.Repositories;
+using GreatOptionTrader.Services.Converters;
 using IBApi;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Threading;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows.Controls;
-using GreatOptionTrader.Services.Converters;
+using System.Threading;
+using System.Windows.Threading;
 
 namespace GreatOptionTrader.Services.Connectors;
 
-public delegate void ItemRequestedEventHandler<TItem> (int requestId, TItem item);
-
 public class InteractiveBroker {
-    
     private readonly IbWrapper wrapper;
     private readonly EReaderMonitorSignal monitor;
     private readonly EClientSocket socket;
@@ -24,20 +21,30 @@ public class InteractiveBroker {
     private readonly List<IPriceable<double>> instrumentCache;
 
     public InteractiveBroker(
-        ILogger<InteractiveBroker> logger) {
+        ILogger<InteractiveBroker> logger,
+        ObservableCollection<string> accounts,
+        Dispatcher dispatcher) {
         instrumentCache = new(100);
-        wrapper = new IbWrapper(instrumentCache, logger);
+        wrapper = new IbWrapper(instrumentCache, logger, accounts, dispatcher);
         monitor = new EReaderMonitorSignal();
         socket = new EClientSocket(wrapper, monitor);
-
     }
 
-    public event ItemRequestedEventHandler<Instrument> OnContractDetailsRequested {
-        add => wrapper.OnContractDetailsRequested += value;
-        remove => wrapper.OnContractDetailsRequested -= value;
+    public event ItemUpdatedEvent<Instrument> ContractUpdated {
+        add => wrapper.ContractUpdated += value;
+        remove => wrapper.ContractUpdated -= value;
     }
 
-    public IEnumerable<string> Accounts => wrapper.Accounts ?? [];
+    public event ItemUpdatedEvent<OrderStatusEventArgument> OrderStatusUpdated {
+        add => wrapper.OrderStatusUpdated += value;
+        remove => wrapper.OrderStatusUpdated -= value;
+    }
+
+    public event ItemUpdatedEvent<CommissionUpdateEventArgs> CommissionUpdated {
+        add => wrapper.CommissionUpdated += value;
+        remove => wrapper.CommissionUpdated -= value;
+    }
+
     public bool IsConnected () => socket.IsConnected();
 
     public void Connect (int clientId, string host = "127.0.0.1", int port = 7497) {
@@ -102,13 +109,13 @@ public class InteractiveBroker {
         
         socket.reqMktData(
             ticker, 
-            instrument.Instrument.ToIbContract(),
+            instrument.Instrument.ToIBContract(),
             string.Empty, false, false, null);
     }
 
     public int GetValidOrderId () => wrapper.ValidOrderId++;
 
-    public void PlaceOrder(Instrument instrument, Models.Order order) {
-        socket.placeOrder(order.OrderId, instrument.ToIbContract(), order.ToIbOrder());
+    public void PlaceOrder(Instrument instrument, Core.Order order) {
+        socket.placeOrder(order.OrderId, instrument.ToIBContract(), order.ToIBLimitOrder());
     }
 }

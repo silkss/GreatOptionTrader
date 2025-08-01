@@ -5,7 +5,7 @@
              xmlns:vm="clr-namespace:GreatOptionTrader.ViewModels"
              xmlns:models="clr-namespace:GreatOptionTrader.Models"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
-             xmlns:enums="clr-namespace:GreatOptionTrader.Types"
+             xmlns:enums="clr-namespace:Core;assembly=Core"
              >
     <Application.Resources>
         <Thickness x:Key="BaseMargin" Left="4" Top="4" Right="4" Bottom="4"/>
@@ -49,6 +49,13 @@
                 <x:Type TypeName="enums:TradeDirection"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
+
+        <Style TargetType="ComboBox" x:Key="BaseComboBoxStyle">
+            <Setter Property="ItemContainerStyle" Value="{StaticResource BaseComboBoxItemStyle}"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value ="Center"/>
+            <Setter Property="Margin" Value="{StaticResource BaseMargin}"/>
+        </Style>
         
         <DataTemplate DataType="{x:Type models:Instrument}" x:Key="BaseInsturmentInfo">
             <UniformGrid Columns="1">
@@ -68,29 +75,57 @@
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type vm:GroupViewModel}">
-            <UniformGrid Rows="1">
-                <TextBlock Text="{Binding Group.Id}" Style="{StaticResource BaseTextBlockStyle}"/>
-                <TextBlock Text="{Binding Group.Name}" Style="{StaticResource BaseTextBlockStyle}"/>
-            </UniformGrid>
+            <Grid >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="42"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0"
+                    Text="{Binding Group.Id}" Style="{StaticResource BaseTextBlockStyle}"/>
+                <TextBlock Grid.Column="1"
+                           Text="{Binding Group.Name}"
+                           TextWrapping="Wrap"
+                           Style="{StaticResource BaseTextBlockStyle}"/>
+            </Grid>
         </DataTemplate>
 
         <DataTemplate DataType="{x:Type vm:InstrumentViewModel}">
             <UniformGrid Rows="1">
-                <TextBlock 
-                    Text="{Binding Instrument.Name}"
-                    Style="{StaticResource BaseTextBlockStyle}"/>
+                <UniformGrid Rows="1">
+                    <TextBlock 
+                        Text="{Binding Instrument.Name}"
+                        Style="{StaticResource BaseTextBlockStyle}"/>
+                    <TextBlock 
+                        Text="{Binding Instrument.Multiplier}"
+                        Style="{StaticResource BaseTextBlockStyle}"/>
+                </UniformGrid>
+
+                <UniformGrid Rows="1" DataContext="{Binding Position}">
+                    <TextBlock
+                        Style="{StaticResource BaseTextBlockStyle}"
+                        Text="{Binding CurrentVolume}"/>
+                    <TextBlock
+                        Style="{StaticResource BaseTextBlockStyle}"
+                        Text="{Binding OpenPnL}"/>
+                    <TextBlock 
+                        Style="{StaticResource BaseTextBlockStyle}"
+                        Text="{Binding AverageFilledPrice}"/>
+                </UniformGrid>
                 
                 <UniformGrid Rows="1">
                     <TextBlock 
                         TextAlignment="Left"
+                        ToolTip="Bid"
                         Text="{Binding BidPrice}"
                         Style="{StaticResource BaseTextBlockStyle}"/>
                     <TextBlock
                         TextAlignment="Center"
+                        ToolTip="Last"
                         Text="{Binding LastPrice}" 
                         Style="{StaticResource BaseTextBlockStyle}"/>
                     <TextBlock
                         TextAlignment="Right"
+                        ToolTip="Ask"
                         Text="{Binding AskPrice}"
                         Style="{StaticResource BaseTextBlockStyle}"/>
                 </UniformGrid>
