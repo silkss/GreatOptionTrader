@@ -33,6 +33,7 @@ public class InstrumentGroupRepository {
         this.broker = broker;
         this.instrumentRepository = instrumentRepository;
         this.ordersRepository = ordersRepository;
+
         List<InstrumentGroup> items;
 
         using (var db = new GOTContext()) {
@@ -64,4 +65,17 @@ public class InstrumentGroupRepository {
         InstrumentGroup group = new InstrumentGroup() { Name = name };
         Create(group);
     }
+
+    public void UpdateAll () { 
+        using (var db = new GOTContext()) {
+            foreach (var item in Items) {
+                db.InstrumentGroups?.Update(item.Group);
+            }
+
+            db.SaveChanges();
+        }
+    }
+
 }
+
+

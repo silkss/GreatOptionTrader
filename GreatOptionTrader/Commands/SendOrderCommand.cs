@@ -7,7 +7,8 @@ public class SendOrderCommand (InteractiveBroker broker) : Base.Command {
     public override bool CanExecute (object? parameter) => broker.IsConnected()
         && parameter is InstrumentViewModel ivm
         && ivm.WantedPrice > 0m
-        && ivm.WantedVolume > 0m;
+        && ivm.WantedVolume > 0m
+        && ivm.OpenOrder == null;
 
     public override void Execute (object? parameter) {
         if (parameter is not InstrumentViewModel ivm) {
@@ -15,6 +16,10 @@ public class SendOrderCommand (InteractiveBroker broker) : Base.Command {
         }
 
         if (ivm.WantedAccount == null) {
+            return;
+        }
+
+        if (ivm.OpenOrder != null) {
             return;
         }
 

@@ -50,6 +50,7 @@ public partial class App : Application {
     }
 
     protected override void OnExit (ExitEventArgs e) {
+        instrumentGroupRepository.UpdateAll();
         base.OnExit(e);
     }
 }

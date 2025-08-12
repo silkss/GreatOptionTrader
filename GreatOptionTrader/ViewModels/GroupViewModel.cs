@@ -38,6 +38,7 @@ public class GroupViewModel : Base.ObservableObject {
         this.RequestOptionCommand = new LambdaCommand(onRequestOptionCommand, canRequestOptionCommand);
         this.broker.ContractUpdated += OnInstrumentUpdated;
     }
+
     public bool IsStarted { get; set; }
     public InstrumentGroup Group { get; }
     public ObservableCollection<InstrumentViewModel> Instruments { get; }
@@ -62,19 +63,19 @@ public class GroupViewModel : Base.ObservableObject {
     }
     
     public void OnInstrumentUpdated(int requestId, Instrument option) {
-        if (requestId != Group.Id) {
-            return;
-        }
-
-        if (Instruments.Any(instrument => instrument.Instrument.Id == option.Id)) {
-            return;
-        }
+        if (requestId != Group.Id) return;
+        if (Instruments.Any(instrument => instrument.Instrument.Id == option.Id)) return;
 
         option.InstrumentGroupId = Group.Id;
 
         instrumentRepository.Add(option);
 
-        dispatcher.Invoke(() => Instruments.Add(createInstrumentViewModel(option)));
+        var optionVM = createInstrumentViewModel(option);
+        dispatcher.Invoke(() => Instruments.Add(optionVM));
+
+        if (IsStarted) {
+            broker.AddInstrumentToCache(optionVM);
+        }
     }
 
     #region RequestOptionCommand

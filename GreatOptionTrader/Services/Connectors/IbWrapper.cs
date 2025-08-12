@@ -24,6 +24,7 @@ internal class IbWrapper (
     public event ItemUpdatedEvent<Instrument> ContractUpdated = delegate { };
     public event ItemUpdatedEvent<OrderStatusEventArgument> OrderStatusUpdated = delegate { };
     public event ItemUpdatedEvent<CommissionUpdateEventArgs> CommissionUpdated = delegate { };
+    public event ItemUpdatedEvent<CompletedOrderEventArgument> CompletedOrderUpdated = delegate { };
 
     public override void error (int id, int errorCode, string errorMsg, string advancedOrderRejectJson) {
         logger.LogError("{id}: {errorCode}: {message}", id, errorCode, errorMsg);
@@ -84,14 +85,13 @@ internal class IbWrapper (
         OrderStatusUpdated.Invoke(orderId, arg);
     }
 
-
     public override void openOrder (
         int orderId, 
         Contract contract, 
         IBApi.Order order, 
         OrderState orderState) {
         CommissionUpdateEventArgs args;
-        if (orderState.Commission == double.MaxValue || orderState.Commission <= 0.0) {
+        if (orderState.Commission is double.MaxValue or <= 0.0) {
             args = new CommissionUpdateEventArgs() {
                 Commission = 0.0m,
                 PermId = order.PermId
@@ -105,5 +105,14 @@ internal class IbWrapper (
             PermId = order.PermId
         };
         CommissionUpdated.Invoke(orderId, args);
+    }
+
+    public override void completedOrder (Contract contract, Order order, OrderState orderState) {
+        CompletedOrderEventArgument arg = new CompletedOrderEventArgument() {
+            FilledVolume = order.FilledQuantity,
+            Status = orderState.Status.ToOrderStatus()
+        };
+
+        CompletedOrderUpdated.Invoke(order.PermId, arg);
     }
 }

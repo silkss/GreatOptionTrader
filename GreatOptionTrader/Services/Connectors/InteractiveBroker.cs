@@ -45,6 +45,11 @@ public class InteractiveBroker {
         remove => wrapper.CommissionUpdated -= value;
     }
 
+    public event ItemUpdatedEvent<CompletedOrderEventArgument> CompletedOrderUpdated {
+        add => wrapper.CompletedOrderUpdated += value;
+        remove => wrapper.CompletedOrderUpdated -= value;
+    }
+
     public bool IsConnected () => socket.IsConnected();
 
     public void Connect (int clientId, string host = "127.0.0.1", int port = 7497) {
@@ -65,6 +70,7 @@ public class InteractiveBroker {
         Thread.Sleep(500);
         if (socket.IsConnected()) {
             socket.reqMarketDataType(3);
+            socket.reqCompletedOrders(apiOnly: true);
         }
     }
 

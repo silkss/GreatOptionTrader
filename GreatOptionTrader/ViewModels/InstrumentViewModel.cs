@@ -4,11 +4,23 @@ using GreatOptionTrader.EventArguments;
 using GreatOptionTrader.Models;
 using GreatOptionTrader.Services.Connectors;
 using GreatOptionTrader.Services.Repositories;
+using System.Collections.Generic;
 
 namespace GreatOptionTrader.ViewModels;
 
 public class InstrumentViewModel : Base.ObservableObject, IPriceable<double> {
     private readonly OrdersRepository ordersRepository;
+
+    private static Order? checkIfHaveOpenOrder(IEnumerable<Order> orders) {
+        Order? openOrder = null;
+        foreach (var order in orders) {
+            if (order.Status == OrderStatus.Submitted) {
+                openOrder = order;
+            }
+        }
+
+        return openOrder;
+    }
 
     public InstrumentViewModel (
         Instrument instrument, 
@@ -17,6 +29,7 @@ public class InstrumentViewModel : Base.ObservableObject, IPriceable<double> {
         Instrument = instrument;
         this.ordersRepository = ordersRepository;
         Position = new PositionViewModel(instrument.Orders);
+        OpenOrder = checkIfHaveOpenOrder(instrument.Orders);
         SubscribeOwnEvents(broker);
     }
 
@@ -43,9 +56,11 @@ public class InstrumentViewModel : Base.ObservableObject, IPriceable<double> {
         if (price <= 0) {
             return;
         }
+        
         if (price == double.MaxValue) {
             return;
         }
+
         var newPrice = (decimal)price;
         if (AskPrice != newPrice) {
             AskPrice = newPrice;
@@ -61,9 +76,11 @@ public class InstrumentViewModel : Base.ObservableObject, IPriceable<double> {
         if (price <= 0) {
             return;
         }
+
         if (price == double.MaxValue) {
             return;
         }
+
         var newPrice = (decimal)price;
         if (BidPrice != newPrice) {
             BidPrice = newPrice;
@@ -79,9 +96,11 @@ public class InstrumentViewModel : Base.ObservableObject, IPriceable<double> {
         if (price <= 0) {
             return;
         }
+
         if (price == double.MaxValue) {
             return;
         }
+
         var newPrice = (decimal)price;
         if (LastPrice != newPrice) {
             LastPrice = newPrice;
@@ -100,15 +119,28 @@ public class InstrumentViewModel : Base.ObservableObject, IPriceable<double> {
     public void SubscribeOwnEvents (InteractiveBroker broker) {
         broker.OrderStatusUpdated += UpdateOrderStatus;
         broker.CommissionUpdated += UpdateOrderCommission;
+        broker.CompletedOrderUpdated += OnCompletedOrderUpdated;
+    }
+
+    public void OnCompletedOrderUpdated(int permId, CompletedOrderEventArgument arg) {
+        if (OpenOrder == null) return;
+        if (OpenOrder.PermId != permId) return;
+
+        OpenOrder.FilledVolume = arg.FilledVolume;
+        OpenOrder.Status = arg.Status;
+
+        if (OpenOrder.AverageFilledPrice == 0m) {
+            OpenOrder.AverageFilledPrice = OpenOrder.LimitPrice;
+        }
+
+        Position.ProcessOrder(OpenOrder);
+        ordersRepository.Update(OpenOrder);
+        OpenOrder = null;
     }
 
     public void UpdateOrderStatus(int id, OrderStatusEventArgument arg) {
-        if (OpenOrder == null) {
-            return;
-        }
-        if (OpenOrder.OrderId != id) {
-            return;
-        }
+        if (OpenOrder == null) return;
+        if (OpenOrder.OrderId != id) return;
 
         OpenOrder.Status = arg.Status;
         OpenOrder.AverageFilledPrice = arg.AverageFilledPrice;
