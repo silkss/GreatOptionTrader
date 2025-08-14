@@ -14,6 +14,7 @@ public class MainViewModel (
     public StartGroupCommand StartGroupCommand { get; } = new StartGroupCommand(broker);
     public CreateGroupCommand CreateGroup { get; } = new CreateGroupCommand(instrumentGroupsRepository);
     public SendOrderCommand SendOrderCommand { get; } = new SendOrderCommand(broker);
+    public CancelOrderCommand CancelOrderCommand { get; } = new CancelOrderCommand(broker);
     public RequestOptionCommand RequestOptionCommand { get; } = new RequestOptionCommand(broker);
     public ObservableCollection<GroupViewModel> Groups => instrumentGroupsRepository.Items;
     public ObservableCollection<string> Accounts => accounts;

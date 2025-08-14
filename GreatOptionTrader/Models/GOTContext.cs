@@ -5,7 +5,7 @@ using System;
 namespace GreatOptionTrader.Models;
 public class GOTContext : DbContext {
     public DbSet<InstrumentGroup>? InstrumentGroups { get; set; }
-    public DbSet<Instrument>? Instruments { get; set; }
+    public DbSet<OptionModel>? Options { get; set; }
     public DbSet<Order>? Orders { get; set; }
 
     public string DbPath { get; }
@@ -21,12 +21,12 @@ public class GOTContext : DbContext {
 
     protected override void OnModelCreating (ModelBuilder modelBuilder) {
         modelBuilder.Entity<InstrumentGroup>()
-            .HasMany(e => e.Instruments)
+            .HasMany(e => e.Options)
             .WithOne()
             .HasForeignKey(e => e.InstrumentGroupId)
             .IsRequired(true);
 
-        modelBuilder.Entity<Instrument>()
+        modelBuilder.Entity<OptionModel>()
             .HasMany(e => e.Orders)
             .WithOne()
             .HasForeignKey(e => e.InstrumentId)

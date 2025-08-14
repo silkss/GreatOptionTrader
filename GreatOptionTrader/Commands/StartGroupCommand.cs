@@ -11,12 +11,6 @@ public class StartGroupCommand (InteractiveBroker broker) : Base.Command {
         if (parameter is not GroupViewModel group) {
             return;
         }
-        if (group.IsStarted) { return; }
-
-        foreach (var instrumentViewModel in group.Instruments) {
-            broker.AddInstrumentToCache(instrumentViewModel);
-        }
-
-        group.IsStarted = true;
+        group.Start(broker);
     }
 }

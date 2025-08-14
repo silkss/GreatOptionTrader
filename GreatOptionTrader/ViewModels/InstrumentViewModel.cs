@@ -23,7 +23,7 @@ public class InstrumentViewModel : Base.ObservableObject, IPriceable<double> {
     }
 
     public InstrumentViewModel (
-        Instrument instrument, 
+        OptionModel instrument, 
         OrdersRepository ordersRepository, 
         InteractiveBroker broker) {
         Instrument = instrument;
@@ -34,7 +34,7 @@ public class InstrumentViewModel : Base.ObservableObject, IPriceable<double> {
     }
 
     public PositionViewModel Position { get; }
-    public Instrument Instrument { get; }
+    public OptionModel Instrument { get; }
     public Order? OpenOrder { get; set; }
 
     public decimal AskPrice { get; private set; }
@@ -145,11 +145,12 @@ public class InstrumentViewModel : Base.ObservableObject, IPriceable<double> {
         OpenOrder.Status = arg.Status;
         OpenOrder.AverageFilledPrice = arg.AverageFilledPrice;
         OpenOrder.FilledVolume = arg.FilledVolume;
+        
+        ordersRepository.Update(OpenOrder);
 
         if (OpenOrder.Status == OrderStatus.Filled) {
             if (OpenOrder.IsCompleted) {
                 Position.ProcessOrder(OpenOrder);
-                ordersRepository.Update(OpenOrder);
                 OpenOrder = null;
                 return;
             }

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net.Sockets;
 using System.Threading;
 using System.Windows.Threading;
 
@@ -30,7 +31,7 @@ public class InteractiveBroker {
         socket = new EClientSocket(wrapper, monitor);
     }
 
-    public event ItemUpdatedEvent<Instrument> ContractUpdated {
+    public event ItemUpdatedEvent<OptionModel> ContractUpdated {
         add => wrapper.ContractUpdated += value;
         remove => wrapper.ContractUpdated -= value;
     }
@@ -121,7 +122,8 @@ public class InteractiveBroker {
 
     public int GetValidOrderId () => wrapper.ValidOrderId++;
 
-    public void PlaceOrder(Instrument instrument, Core.Order order) {
+    public void PlaceOrder(OptionModel instrument, Core.Order order) {
         socket.placeOrder(order.OrderId, instrument.ToIBContract(), order.ToIBLimitOrder());
     }
+    public void CancelOrder (int orderId) => socket.cancelOrder(orderId, new());
 }

@@ -59,7 +59,7 @@
             <Setter Property="Margin" Value="{StaticResource BaseMargin}"/>
         </Style>
         
-        <DataTemplate DataType="{x:Type models:Instrument}" x:Key="BaseInsturmentInfo">
+        <DataTemplate DataType="{x:Type models:OptionModel}" x:Key="BaseInsturmentInfo">
             <UniformGrid Columns="1">
                 <UniformGrid Rows="1">
                     <TextBlock Text="name:" Style="{StaticResource BaseTextBlockStyle}" />

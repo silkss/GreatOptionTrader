@@ -3,6 +3,7 @@ using GreatOptionTrader.Models;
 using IBApi;
 using System;
 using System.Globalization;
+using System.Linq;
 
 namespace GreatOptionTrader.Services.Converters;
 
@@ -10,19 +11,23 @@ internal static class IbConverter {
     public static DateTime ToDateTime (this string ibDateTime) =>
         DateTime.ParseExact(ibDateTime, "yyyyMMdd", CultureInfo.InvariantCulture);
 
-    public static Instrument ToInstrument (this ContractDetails contract) {
-        return new Instrument() {
+    public static OptionModel ToInstrument (this ContractDetails contract) {
+        return new OptionModel() {
             Id = contract.Contract.ConId,
             Name = contract.Contract.LocalSymbol,
             Symbol = contract.Contract.Symbol,
             Exchange = contract.Contract.Exchange,
             Multiplier = int.Parse(contract.Contract.Multiplier),
             ExpirationDate = contract.Contract.LastTradeDate.ToDateTime(),
-            Strike = contract.Contract.Strike
+            Strike = (decimal)contract.Contract.Strike,
+            PriceMagnifier = contract.PriceMagnifier,
+            Right = contract.Contract.Right == "PUT" ? OptionRight.Put : OptionRight.Call,
+            TradingClass = contract.Contract.TradingClass,
+            MarketRulesId = [.. contract.MarketRuleIds.Split(",").Distinct().Select(int.Parse)]
         };
     }
 
-    public static Contract ToIBContract (this Instrument instrument) => new() {
+    public static Contract ToIBContract (this OptionModel instrument) => new() {
         ConId = instrument.Id,
         Exchange = instrument.Exchange,
         LastTradeDateOrContractMonth = instrument.ExpirationDate.ToString("yyyyMMdd")

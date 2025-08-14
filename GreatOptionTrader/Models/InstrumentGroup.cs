@@ -6,5 +6,5 @@ public class InstrumentGroup {
     public int Id { get; set; }
     public required string Name { get; set; }
 
-    public List<Instrument> Instruments { get; } = [];
+    public List<OptionModel> Options { get; } = [];
 }

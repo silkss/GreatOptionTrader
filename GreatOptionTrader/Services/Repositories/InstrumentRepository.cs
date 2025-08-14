@@ -2,13 +2,13 @@
 
 namespace GreatOptionTrader.Services.Repositories;
 public class InstrumentRepository {
-    public void Add(Instrument instrument) {
+    public void Add(OptionModel instrument) {
         using (var db = new GOTContext()) {
-            if (db.Instruments == null) {
+            if (db.Options == null) {
                 return;
             }
             try {
-                db.Instruments.Add(instrument);
+                db.Options.Add(instrument);
                 db.SaveChanges();
             } 
             catch (System.InvalidOperationException) {

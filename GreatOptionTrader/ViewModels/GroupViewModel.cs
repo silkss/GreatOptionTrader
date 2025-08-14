@@ -1,9 +1,12 @@
-﻿using GreatOptionTrader.Commands.Base;
-using GreatOptionTrader.Models;
+﻿using GreatOptionTrader.Models;
 using GreatOptionTrader.Services.Connectors;
 using GreatOptionTrader.Services.Repositories;
 using System.Collections.ObjectModel;
+using System.IO.IsolatedStorage;
 using System.Linq;
+using System.Reflection.Metadata;
+using System.Security.Cryptography;
+using System.Threading.Tasks;
 using System.Windows.Threading;
 
 namespace GreatOptionTrader.ViewModels;
@@ -15,8 +18,16 @@ public class GroupViewModel : Base.ObservableObject {
     private readonly Dispatcher dispatcher;
     private string? requestedOptionName;
     private string? requestedOptionExchange;
+    private Task? pnlUpdaterWorker;
 
-    private InstrumentViewModel createInstrumentViewModel(Instrument instrument) {
+    private async Task makePnLUpdaterWorker() {
+        while (IsStarted) {
+            UpdatePnL();
+            await Task.Delay(2000);
+        }
+    }
+
+    private InstrumentViewModel createInstrumentViewModel(OptionModel instrument) {
         return new InstrumentViewModel(
             instrument: instrument,
             ordersRepository: ordersRepository,
@@ -34,12 +45,14 @@ public class GroupViewModel : Base.ObservableObject {
         this.broker = broker;
         this.instrumentRepository = instrumentRepository;
         this.ordersRepository = ordersRepository;
-        this.Instruments = new ObservableCollection<InstrumentViewModel>(group.Instruments.Select(createInstrumentViewModel));
-        this.RequestOptionCommand = new LambdaCommand(onRequestOptionCommand, canRequestOptionCommand);
+        this.Instruments = new ObservableCollection<InstrumentViewModel>(group.Options.Select(createInstrumentViewModel));
         this.broker.ContractUpdated += OnInstrumentUpdated;
     }
 
     public bool IsStarted { get; set; }
+    public decimal OpenPnL { get; private set; }
+    public decimal FixedPnL { get; private set; }
+
     public InstrumentGroup Group { get; }
     public ObservableCollection<InstrumentViewModel> Instruments { get; }
 
@@ -62,7 +75,38 @@ public class GroupViewModel : Base.ObservableObject {
         }
     }
     
-    public void OnInstrumentUpdated(int requestId, Instrument option) {
+    public void Start (InteractiveBroker broker) {
+        if (IsStarted) { return; }
+
+        foreach (var instrumentViewModel in Instruments) {
+            broker.AddInstrumentToCache(instrumentViewModel);
+        }
+
+        IsStarted = true;
+        RaisePropertyChanged(nameof(IsStarted));
+        pnlUpdaterWorker = makePnLUpdaterWorker();
+    }
+
+    public void UpdatePnL () {
+        decimal openPnl = 0m;
+        decimal fixedPnL = 0m;
+        foreach (var ivm in Instruments) {
+            openPnl += ivm.Position.OpenPnL;
+            fixedPnL += ivm.Position.FixedPnL;
+        }
+
+        if (OpenPnL != openPnl) {
+            OpenPnL = openPnl;
+            RaisePropertyChanged(nameof(OpenPnL));
+        }
+
+        if (FixedPnL != fixedPnL ) {
+            FixedPnL = fixedPnL;
+            RaisePropertyChanged(nameof(FixedPnL));
+        }
+    }
+
+    public void OnInstrumentUpdated(int requestId, OptionModel option) {
         if (requestId != Group.Id) return;
         if (Instruments.Any(instrument => instrument.Instrument.Id == option.Id)) return;
 
@@ -77,19 +121,4 @@ public class GroupViewModel : Base.ObservableObject {
             broker.AddInstrumentToCache(optionVM);
         }
     }
-
-    #region RequestOptionCommand
-    public LambdaCommand RequestOptionCommand { get; }
-    private void onRequestOptionCommand(object? p) {
-        if (string.IsNullOrEmpty(RequestedOptionName) || 
-            string.IsNullOrEmpty(RequestedOptionExchange)) {
-            return;
-        }
-
-        broker.RequestOption(Group.Id, RequestedOptionName, RequestedOptionExchange);
-    }
-    private bool canRequestOptionCommand (object? p) => broker.IsConnected()
-        && !string.IsNullOrEmpty(RequestedOptionName)
-        && !string.IsNullOrEmpty(RequestedOptionExchange);
-    #endregion
 }

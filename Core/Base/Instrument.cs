@@ -1,18 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 
-namespace GreatOptionTrader.Models;
-
-public class Instrument {
+namespace Core.Base;
+public abstract class Instrument {
     public required int Id { get; init; }
     public required string Name { get; init; }
     public required string Symbol { get; init; }
     public required string Exchange { get; init; }
     public required DateTime ExpirationDate { get; init; }
     public required int Multiplier { get; init; }
-    public double Strike { get; init; }
-
-    public int InstrumentGroupId { get; set; }
-
-    public List<Core.Order> Orders { get; set; } = [];
+    public required int PriceMagnifier { get; init; }
 }

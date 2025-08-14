@@ -1,13 +1,14 @@
-﻿using GreatOptionTrader.Models;
+﻿using Core;
+using GreatOptionTrader.Abstractions;
+using GreatOptionTrader.EventArguments;
+using GreatOptionTrader.Models;
+using GreatOptionTrader.Services.Converters;
 using IBApi;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using GreatOptionTrader.Abstractions;
-using GreatOptionTrader.Services.Converters;
-using GreatOptionTrader.EventArguments;
-using System.ComponentModel;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows.Threading;
 
 namespace GreatOptionTrader.Services.Connectors;
@@ -21,13 +22,23 @@ internal class IbWrapper (
 
     public int ValidOrderId;
 
-    public event ItemUpdatedEvent<Instrument> ContractUpdated = delegate { };
+    public event ItemUpdatedEvent<OptionModel> ContractUpdated = delegate { };
     public event ItemUpdatedEvent<OrderStatusEventArgument> OrderStatusUpdated = delegate { };
     public event ItemUpdatedEvent<CommissionUpdateEventArgs> CommissionUpdated = delegate { };
     public event ItemUpdatedEvent<CompletedOrderEventArgument> CompletedOrderUpdated = delegate { };
 
     public override void error (int id, int errorCode, string errorMsg, string advancedOrderRejectJson) {
         logger.LogError("{id}: {errorCode}: {message}", id, errorCode, errorMsg);
+            switch (errorCode) {
+                case 110: // The price does not conform to the minimum price variation for this contract.
+                var arg = new OrderStatusEventArgument() {
+                    AverageFilledPrice = 0m,
+                    Status = OrderStatus.Cancelled,
+                    FilledVolume = 0m
+                };
+                OrderStatusUpdated.Invoke(id, arg);
+                break;
+            }
     }
 
     public override void error (string str) => logger.LogCritical("{message}", str);
@@ -107,7 +118,7 @@ internal class IbWrapper (
         CommissionUpdated.Invoke(orderId, args);
     }
 
-    public override void completedOrder (Contract contract, Order order, OrderState orderState) {
+    public override void completedOrder (Contract contract,  IBApi.Order order, OrderState orderState) {
         CompletedOrderEventArgument arg = new CompletedOrderEventArgument() {
             FilledVolume = order.FilledQuantity,
             Status = orderState.Status.ToOrderStatus()

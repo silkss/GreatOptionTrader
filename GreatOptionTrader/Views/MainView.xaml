@@ -41,9 +41,18 @@
                         CommandParameter="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem}"/>
                 </StackPanel>
 
-                <ListView x:Name="dgInstrumentGroups"
-                    Grid.Row="1"
-                    ItemsSource="{Binding Groups}"/>
+                <DataGrid x:Name="dgInstrumentGroups"
+                          Background="Transparent"
+                          IsReadOnly="True"
+                          AutoGenerateColumns="False"
+                          Grid.Row="1"
+                          ItemsSource="{Binding Groups}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Name" Binding="{Binding Group.Name}" Width="1*"/>
+                        <DataGridTextColumn Header="OpenPnL" Binding="{Binding OpenPnL}" Width="1*"/>
+                        <DataGridTextColumn Header="FixedPnL" Binding="{Binding FixedPnL}" Width="1*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
                 
             </Grid>
 
@@ -73,11 +82,15 @@
                         Style="{StaticResource BaseTextBoxStyle}"
                         Text="{Binding ElementName=lvInstruments, Path=SelectedItem.WantedPrice, Mode=TwoWay}"/>
 
-                    <Button
+                    <Button Content="SendOrder"
                         Style="{StaticResource BaseButtonStyle}"
                         Command="{Binding SendOrderCommand}"
-                        CommandParameter="{Binding ElementName=lvInstruments, Path=SelectedItem}"
-                        Content="SendOrder"/>
+                        CommandParameter="{Binding ElementName=lvInstruments, Path=SelectedItem}"/>
+
+                    <Button Content="CancelOrder"
+                            Command="{Binding CancelOrderCommand}"
+                            CommandParameter="{Binding ElementName=lvInstruments, Path=SelectedItem}"
+                            Style="{StaticResource BaseButtonStyle}"/>
 
                 </UniformGrid>
 

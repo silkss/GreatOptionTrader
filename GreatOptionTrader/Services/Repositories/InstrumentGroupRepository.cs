@@ -39,7 +39,7 @@ public class InstrumentGroupRepository {
         using (var db = new GOTContext()) {
             items = db
                 .InstrumentGroups? 
-                .Include(group => group.Instruments)
+                .Include(group => group.Options)
                 .ThenInclude(sec => sec.Orders)
                 .ToList() ?? [];
         }
