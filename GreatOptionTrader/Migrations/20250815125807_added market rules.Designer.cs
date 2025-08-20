@@ -3,6 +3,7 @@ using System;
 using GreatOptionTrader.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,16 +11,18 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GreatOptionTrader.Migrations
 {
     [DbContext(typeof(GOTContext))]
-    partial class GOTContextModelSnapshot : ModelSnapshot
+    [Migration("20250815125807_added market rules")]
+    partial class addedmarketrules
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.7");
 
             modelBuilder.Entity("Core.Order", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("OrderId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -29,9 +32,6 @@ namespace GreatOptionTrader.Migrations
 
                     b.Property<decimal>("AverageFilledPrice")
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("BrokerId")
-                        .HasColumnType("INTEGER");
 
                     b.Property<decimal>("Commission")
                         .HasColumnType("TEXT");
@@ -60,8 +60,7 @@ namespace GreatOptionTrader.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("Id")
-                        .HasName("PK_order");
+                    b.HasKey("OrderId");
 
                     b.HasIndex("InstrumentId");
 

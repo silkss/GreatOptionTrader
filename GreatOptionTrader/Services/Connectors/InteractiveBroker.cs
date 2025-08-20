@@ -1,16 +1,16 @@
-﻿using GreatOptionTrader.Abstractions;
-using GreatOptionTrader.DTO;
-using GreatOptionTrader.EventArguments;
+﻿using GreatOptionTrader.DTO;
 using GreatOptionTrader.Models;
+using GreatOptionTrader.Abstractions;
+using GreatOptionTrader.EventArguments;
 using GreatOptionTrader.Services.Converters;
 using IBApi;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Net.Sockets;
 using System.Threading;
 using System.Windows.Threading;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Net.NetworkInformation;
 
 namespace GreatOptionTrader.Services.Connectors;
 
@@ -19,14 +19,17 @@ public class InteractiveBroker {
     private readonly EReaderMonitorSignal monitor;
     private readonly EClientSocket socket;
 
-    private readonly List<IPriceable<double>> instrumentCache;
+    private readonly List<IPriceable<decimal>> instrumentCache;
+    private readonly Dictionary<int, List<Core.PriceIncrement>> marketRules;
 
     public InteractiveBroker(
         ILogger<InteractiveBroker> logger,
         ObservableCollection<string> accounts,
         Dispatcher dispatcher) {
         instrumentCache = new(100);
-        wrapper = new IbWrapper(instrumentCache, logger, accounts, dispatcher);
+        marketRules = [];
+
+        wrapper = new IbWrapper(instrumentCache, marketRules, logger, accounts, dispatcher);
         monitor = new EReaderMonitorSignal();
         socket = new EClientSocket(wrapper, monitor);
     }
@@ -106,7 +109,7 @@ public class InteractiveBroker {
         }
     }
 
-    public void AddInstrumentToCache (IPriceable<double> instrument) {
+    public void AddInstrumentToCache (IPriceable<decimal> instrument) {
         int ticker = instrumentCache.Count;
         if (instrumentCache.Any(i => i.Instrument.Id == instrument.Instrument.Id)) {
             return;
@@ -114,6 +117,11 @@ public class InteractiveBroker {
 
         instrumentCache.Add(instrument);
         
+        foreach (var id in instrument.Instrument.MarketRulesId) {
+            if (marketRules.ContainsKey(id)) continue;
+            socket.reqMarketRule(id);
+        }
+
         socket.reqMktData(
             ticker, 
             instrument.Instrument.ToIBContract(),
@@ -123,7 +131,17 @@ public class InteractiveBroker {
     public int GetValidOrderId () => wrapper.ValidOrderId++;
 
     public void PlaceOrder(OptionModel instrument, Core.Order order) {
-        socket.placeOrder(order.OrderId, instrument.ToIBContract(), order.ToIBLimitOrder());
+        var price = order.LimitPrice;
+
+        decimal increment = 0m;
+        if (marketRules.TryGetValue(instrument.MarketRulesId.First(), out var increments)) {
+            increment = increments.First(i => i.LowEdge < price).Increment;
+        }
+        if (increment != 0m) {
+            order.LimitPrice = price - (price % increment);
+        }
+        socket.placeOrder(order.BrokerId, instrument.ToIBContract(), order.ToIBLimitOrder());
     }
+
     public void CancelOrder (int orderId) => socket.cancelOrder(orderId, new());
 }

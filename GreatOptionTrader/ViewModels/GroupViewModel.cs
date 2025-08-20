@@ -2,10 +2,7 @@
 using GreatOptionTrader.Services.Connectors;
 using GreatOptionTrader.Services.Repositories;
 using System.Collections.ObjectModel;
-using System.IO.IsolatedStorage;
 using System.Linq;
-using System.Reflection.Metadata;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 
@@ -50,7 +47,7 @@ public class GroupViewModel : Base.ObservableObject {
     }
 
     public bool IsStarted { get; set; }
-    public decimal OpenPnL { get; private set; }
+    public decimal CurrencyOpenPnL { get; private set; }
     public decimal FixedPnL { get; private set; }
 
     public InstrumentGroup Group { get; }
@@ -88,16 +85,16 @@ public class GroupViewModel : Base.ObservableObject {
     }
 
     public void UpdatePnL () {
-        decimal openPnl = 0m;
+        decimal currencyOpenPnl = 0m;
         decimal fixedPnL = 0m;
         foreach (var ivm in Instruments) {
-            openPnl += ivm.Position.OpenPnL;
+            currencyOpenPnl += ivm.Position.CurrencyOpenPnL;
             fixedPnL += ivm.Position.FixedPnL;
         }
 
-        if (OpenPnL != openPnl) {
-            OpenPnL = openPnl;
-            RaisePropertyChanged(nameof(OpenPnL));
+        if (CurrencyOpenPnL != currencyOpenPnl) {
+            CurrencyOpenPnL = currencyOpenPnl;
+            RaisePropertyChanged(nameof(CurrencyOpenPnL));
         }
 
         if (FixedPnL != fixedPnL ) {

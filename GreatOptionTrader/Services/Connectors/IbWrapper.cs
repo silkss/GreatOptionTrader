@@ -1,20 +1,22 @@
 ﻿using Core;
+using GreatOptionTrader.Models;
 using GreatOptionTrader.Abstractions;
 using GreatOptionTrader.EventArguments;
-using GreatOptionTrader.Models;
 using GreatOptionTrader.Services.Converters;
 using IBApi;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Linq;
 using System.ComponentModel;
 using System.Windows.Threading;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace GreatOptionTrader.Services.Connectors;
 
 internal class IbWrapper (
-        List<IPriceable<double>> instrumentCache,
+        List<IPriceable<decimal>> instrumentCache,
+        Dictionary<int, List<Core.PriceIncrement>> marketRules,
         ILogger<InteractiveBroker> logger,
         ObservableCollection<string> accounts,
         Dispatcher dispatcher) : DefaultEWrapper, INotifyPropertyChanged  {
@@ -60,15 +62,21 @@ internal class IbWrapper (
         switch (field) {
             case TickType.ASK:
             case TickType.DELAYED_ASK:
-                instrumentCache[tickerId].UpdateAskPrice(price);
+                if (price == double.MaxValue) return;
+                if (price <= 0.0) return;
+                instrumentCache[tickerId].UpdateAskPrice((decimal)price);
                 break;
             case TickType.BID:
             case TickType.DELAYED_BID:
-                instrumentCache[tickerId].UpdateBidPrice(price);
+                if (price == double.MaxValue) return;
+                if (price <= 0.0) return;
+                instrumentCache[tickerId].UpdateBidPrice((decimal)price);
                 break;
             case TickType.LAST:
             case TickType.DELAYED_LAST:
-                instrumentCache[tickerId].UpdateLastPrice(price);
+                if (price == double.MaxValue) return;
+                if (price <= 0.0) return;
+                instrumentCache[tickerId].UpdateLastPrice((decimal)price);
                 break;
             default:
                 break;
@@ -125,5 +133,13 @@ internal class IbWrapper (
         };
 
         CompletedOrderUpdated.Invoke(order.PermId, arg);
+    }
+
+    public override void marketRule (int marketRuleId, IBApi.PriceIncrement[] priceIncrements) {
+        if (marketRules.ContainsKey(marketRuleId)) return;
+        marketRules[marketRuleId] = priceIncrements
+            .Select(IbConverter.ToPriceIncrement)
+            .OrderByDescending(p => p.LowEdge)
+            .ToList();
     }
 }

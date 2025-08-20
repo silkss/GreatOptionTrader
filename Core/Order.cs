@@ -5,12 +5,13 @@ namespace Core;
 
 public class Order {
     public bool IsCompleted = false;
+    public int Id { get; init; }
 
     public required TradeDirection Direction { get; init; }
     public required decimal Quantity { get; init; }
     public required decimal LimitPrice { get; set; }
     public required string Account { get; init; }
-    public required int OrderId { get; set; }
+    public required int BrokerId { get; set; }
     public required DateTime CreatedTime { get; init; }
 
     public decimal FilledVolume { get; set; }

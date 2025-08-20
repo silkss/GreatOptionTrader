@@ -2,14 +2,21 @@
 using GreatOptionTrader.Models;
 using IBApi;
 using System;
-using System.Globalization;
 using System.Linq;
+using System.Globalization;
 
 namespace GreatOptionTrader.Services.Converters;
 
 internal static class IbConverter {
     public static DateTime ToDateTime (this string ibDateTime) =>
         DateTime.ParseExact(ibDateTime, "yyyyMMdd", CultureInfo.InvariantCulture);
+
+    public static Core.PriceIncrement ToPriceIncrement (IBApi.PriceIncrement priceIncrement) {
+        return new Core.PriceIncrement() {
+            LowEdge = (decimal)priceIncrement.LowEdge,
+            Increment = (decimal)priceIncrement.Increment,
+        };
+    }
 
     public static OptionModel ToInstrument (this ContractDetails contract) {
         return new OptionModel() {
@@ -35,7 +42,7 @@ internal static class IbConverter {
 
     public static IBApi.Order ToIBLimitOrder (this Core.Order order) => new() {
         Account = order.Account,
-        OrderId = order.OrderId,
+        OrderId = order.BrokerId,
         TotalQuantity = order.Quantity,
         Action = order.Direction == TradeDirection.Buy ? "BUY" : "SELL",
         LmtPrice = (double)order.LimitPrice,

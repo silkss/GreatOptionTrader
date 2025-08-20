@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Core.Base;
 public abstract class Instrument {
@@ -9,4 +10,5 @@ public abstract class Instrument {
     public required DateTime ExpirationDate { get; init; }
     public required int Multiplier { get; init; }
     public required int PriceMagnifier { get; init; }
+    public required List<int> MarketRulesId { get; init; }
 }

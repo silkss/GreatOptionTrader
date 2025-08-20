@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace GreatOptionTrader.ViewModels;
 
-public class InstrumentViewModel : Base.ObservableObject, IPriceable<double> {
+public class InstrumentViewModel : Base.ObservableObject, IPriceable<decimal> {
     private readonly OrdersRepository ordersRepository;
 
     private static Order? checkIfHaveOpenOrder(IEnumerable<Order> orders) {
@@ -52,58 +52,31 @@ public class InstrumentViewModel : Base.ObservableObject, IPriceable<double> {
     public TradeDirection WantedDirection { get; set; }
     public string? WantedAccount { get; set; }
 
-    public void UpdateAskPrice (double price) {
-        if (price <= 0) {
-            return;
-        }
-        
-        if (price == double.MaxValue) {
-            return;
-        }
-
-        var newPrice = (decimal)price;
-        if (AskPrice != newPrice) {
-            AskPrice = newPrice;
+    public void UpdateAskPrice (decimal price) {
+        if (AskPrice != price) {
+            AskPrice = price;
             RaisePropertyChanged(nameof(AskPrice));
         }
 
         if (Position.CurrentVolume < 0m) {
-            Position.OpenPnL = PositionViewModel.CalculatePnL(AskPrice, Position.AverageFilledPrice);
+            Position.CurrencyOpenPnL = Position.CalculateShortPnL(AskPrice, Instrument.Multiplier);
         }
     }
 
-    public void UpdateBidPrice (double price) {
-        if (price <= 0) {
-            return;
-        }
-
-        if (price == double.MaxValue) {
-            return;
-        }
-
-        var newPrice = (decimal)price;
-        if (BidPrice != newPrice) {
-            BidPrice = newPrice;
+    public void UpdateBidPrice (decimal price) {
+        if (BidPrice != price) {
+            BidPrice = price;
             RaisePropertyChanged(nameof(BidPrice));
         }
 
         if (Position.CurrentVolume > 0m) {
-            Position.OpenPnL = PositionViewModel.CalculatePnL(Position.AverageFilledPrice, BidPrice);
+            Position.CurrencyOpenPnL = Position.CalculateLongPnL(BidPrice, Instrument.Multiplier);
         }
     }
 
-    public void UpdateLastPrice (double price) {
-        if (price <= 0) {
-            return;
-        }
-
-        if (price == double.MaxValue) {
-            return;
-        }
-
-        var newPrice = (decimal)price;
-        if (LastPrice != newPrice) {
-            LastPrice = newPrice;
+    public void UpdateLastPrice (decimal price) {
+        if (LastPrice != price) {
+            LastPrice = price;
             RaisePropertyChanged(nameof(LastPrice));
         }
     }
@@ -140,7 +113,7 @@ public class InstrumentViewModel : Base.ObservableObject, IPriceable<double> {
 
     public void UpdateOrderStatus(int id, OrderStatusEventArgument arg) {
         if (OpenOrder == null) return;
-        if (OpenOrder.OrderId != id) return;
+        if (OpenOrder.BrokerId != id) return;
 
         OpenOrder.Status = arg.Status;
         OpenOrder.AverageFilledPrice = arg.AverageFilledPrice;
@@ -161,7 +134,7 @@ public class InstrumentViewModel : Base.ObservableObject, IPriceable<double> {
 
     public void UpdateOrderCommission (int orderId, CommissionUpdateEventArgs args) {
         if (OpenOrder == null) return;
-        if (OpenOrder.OrderId != orderId) return;
+        if (OpenOrder.BrokerId != orderId) return;
 
         OpenOrder.PermId = args.PermId;
         OpenOrder.Commission = args.Commission;

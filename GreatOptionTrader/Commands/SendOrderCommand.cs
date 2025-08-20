@@ -29,7 +29,7 @@ public class SendOrderCommand (InteractiveBroker broker) : Base.Command {
             LimitPrice = ivm.WantedPrice,
             Account = ivm.WantedAccount,
             Quantity = ivm.WantedVolume,
-            OrderId = broker.GetValidOrderId(),
+            BrokerId = broker.GetValidOrderId(),
             InstrumentId = ivm.Instrument.Id
         };
 

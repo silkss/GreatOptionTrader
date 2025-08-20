@@ -1,6 +1,5 @@
 ﻿using GreatOptionTrader.Services.Connectors;
 using GreatOptionTrader.ViewModels;
-using System;
 
 namespace GreatOptionTrader.Commands;
 public class CancelOrderCommand (InteractiveBroker broker) : Base.Command {
@@ -18,6 +17,6 @@ public class CancelOrderCommand (InteractiveBroker broker) : Base.Command {
             return;
         }
 
-        broker.CancelOrder(order.OrderId);
+        broker.CancelOrder(order.BrokerId);
     }
 }

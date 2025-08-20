@@ -20,6 +20,10 @@ public class GOTContext : DbContext {
         => options.UseSqlite($"Data Source={DbPath}");
 
     protected override void OnModelCreating (ModelBuilder modelBuilder) {
+        modelBuilder.Entity<Order>()
+            .HasKey(o => o.Id)
+            .HasName("PK_order");
+
         modelBuilder.Entity<InstrumentGroup>()
             .HasMany(e => e.Options)
             .WithOne()

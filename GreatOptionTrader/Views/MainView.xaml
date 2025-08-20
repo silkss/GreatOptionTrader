@@ -18,132 +18,50 @@
                 <MenuItem Header="создать" Command="{Binding CreateGroup}"/>
             </MenuItem>
         </Menu>
+
         <Grid DockPanel.Dock="Bottom">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*" MaxWidth="250"/>
-                <ColumnDefinition Width="3*" MaxWidth="500"/>
-                <ColumnDefinition Width="1*" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="72" />
             </Grid.ColumnDefinitions>
 
-            <Grid Grid.Column="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="42"/>
-                    <RowDefinition />
-                    <RowDefinition Height="42"/>
-                </Grid.RowDefinitions>
-                    
-                <StackPanel Grid.Row="0" Orientation="Horizontal">
-                    <Button 
-                        Width="34"
-                        Content="->"
+            <StackPanel Grid.Column="1" Orientation="Vertical">
+                <Button Content="запустить"
+                        Height="32"
                         Style="{StaticResource BaseButtonStyle}"
                         Command="{Binding StartGroupCommand}"
                         CommandParameter="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem}"/>
-                </StackPanel>
-
-                <DataGrid x:Name="dgInstrumentGroups"
-                          Background="Transparent"
-                          IsReadOnly="True"
-                          AutoGenerateColumns="False"
-                          Grid.Row="1"
-                          ItemsSource="{Binding Groups}">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Name" Binding="{Binding Group.Name}" Width="1*"/>
-                        <DataGridTextColumn Header="OpenPnL" Binding="{Binding OpenPnL}" Width="1*"/>
-                        <DataGridTextColumn Header="FixedPnL" Binding="{Binding FixedPnL}" Width="1*"/>
-                    </DataGrid.Columns>
-                </DataGrid>
                 
-            </Grid>
-
-            <Grid Grid.Column="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="42"/>
-                    <RowDefinition />
-                    <RowDefinition Height="42"/>
-                </Grid.RowDefinitions>
-                
-                <UniformGrid Grid.Row="0" Rows="1">
-                    <ComboBox 
-                        Style="{StaticResource BaseComboBoxStyle}"
-                        ItemsSource="{Binding Accounts}"
-                        SelectedItem="{Binding ElementName=lvInstruments, Path=SelectedItem.WantedAccount}"/>
-
-                    <ComboBox
-                        Style="{StaticResource BaseComboBoxStyle}"
-                        ItemsSource="{Binding Source={StaticResource TradeDirectionToItemSource}}"
-                        SelectedItem="{Binding ElementName=lvInstruments, Path=SelectedItem.WantedDirection}"/>
-
-                    <TextBox
-                        Style="{StaticResource BaseTextBoxStyle}"
-                        Text="{Binding ElementName=lvInstruments, Path=SelectedItem.WantedVolume, Mode=TwoWay}"/>
-
-                    <TextBox
-                        Style="{StaticResource BaseTextBoxStyle}"
-                        Text="{Binding ElementName=lvInstruments, Path=SelectedItem.WantedPrice, Mode=TwoWay}"/>
-
-                    <Button Content="SendOrder"
-                        Style="{StaticResource BaseButtonStyle}"
-                        Command="{Binding SendOrderCommand}"
-                        CommandParameter="{Binding ElementName=lvInstruments, Path=SelectedItem}"/>
-
-                    <Button Content="CancelOrder"
-                            Command="{Binding CancelOrderCommand}"
-                            CommandParameter="{Binding ElementName=lvInstruments, Path=SelectedItem}"
-                            Style="{StaticResource BaseButtonStyle}"/>
-
-                </UniformGrid>
-
-                <ListView x:Name="lvInstruments" Grid.Row="1"
-                      ItemsSource="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem.Instruments}"/>
-
-                <Grid Grid.Row="2">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <TextBox
-                        Grid.Column="0"
-                        Style="{StaticResource BaseTextBoxStyle}"
-                        Text="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem.RequestedOptionName}"/>
-
-                    <TextBox 
-                        Grid.Column="1"
-                        Style="{StaticResource BaseTextBoxStyle}"
-                        Text="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem.RequestedOptionExchange}"/>
-
-                    <Button
-                        Grid.Column="2"
-                        Content="Request"
-                        Command="{Binding RequestOptionCommand}"
-                        CommandParameter="{Binding ElementName=dgInstrumentGroups,Path=SelectedItem}"
+                <Button Content="изменить"
+                        Height="32"
+                        Command="{Binding EditInstrumentGroup}"
+                        CommandParameter="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem}"
                         Style="{StaticResource BaseButtonStyle}"/>
-                </Grid>
-            </Grid>
+            </StackPanel>
 
-            <Grid Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="42"/>
-                    <RowDefinition />
-                    <RowDefinition Height="42"/>
-                </Grid.RowDefinitions>
+            <DataGrid Grid.Column="0"
+                      x:Name="dgInstrumentGroups"
+                      Background="Transparent"
+                      IsReadOnly="True"
+                      AutoGenerateColumns="False"
+                      ItemsSource="{Binding Groups}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Name" Binding="{Binding Group.Name}" Width=".2*"
+                                        ElementStyle="{StaticResource DataGridTextBlockStyle}"/>
+                    <DataGridTextColumn Header="OpenPnL" Binding="{Binding CurrencyOpenPnL}" Width="72"
+                                        ElementStyle="{StaticResource DataGridTextBlockStyle}"/>
+                    <DataGridTextColumn Header="FixedPnL" Binding="{Binding FixedPnL}" Width="72"
+                                        ElementStyle="{StaticResource DataGridTextBlockStyle}"/>
 
-                <DataGrid x:Name="lvOrders" Grid.Row="1"
-                          ItemsSource="{Binding ElementName=lvInstruments, Path=SelectedItem.Instrument.Orders}"
-                          IsReadOnly="True"
-                          Background="Transparent"
-                          AutoGenerateColumns="False">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="2*"/>
-                        <DataGridTextColumn Header="Direction" Binding="{Binding Direction}" Width="1*"/>
-                        <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" Width="1*"/>
-                        <DataGridTextColumn Header="Filled" Binding="{Binding FilledVolume}" Width="1*"/>
-                        <DataGridTextColumn Header="Lmt. Price" Binding="{Binding LimitPrice}" Width="1*"/>
-                        <DataGridTextColumn Header="Avg. Filled. Price" Binding="{Binding AverageFilledPrice}" Width="1*"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-            </Grid>
+                    <DataGridTemplateColumn Header="Options" Width="1*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ListView Background="Transparent" BorderBrush="Transparent" ItemsSource="{Binding Instruments}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
         </Grid>
     </DockPanel>
 </Window>
