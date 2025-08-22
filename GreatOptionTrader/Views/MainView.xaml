@@ -21,47 +21,61 @@
 
         <Grid DockPanel.Dock="Bottom">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition />
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width=".7*"/>
                 <ColumnDefinition Width="72" />
             </Grid.ColumnDefinitions>
-
-            <StackPanel Grid.Column="1" Orientation="Vertical">
-                <Button Content="запустить"
-                        Height="32"
-                        Style="{StaticResource BaseButtonStyle}"
-                        Command="{Binding StartGroupCommand}"
-                        CommandParameter="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem}"/>
-                
-                <Button Content="изменить"
-                        Height="32"
-                        Command="{Binding EditInstrumentGroup}"
-                        CommandParameter="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem}"
-                        Style="{StaticResource BaseButtonStyle}"/>
-            </StackPanel>
-
+            
             <DataGrid Grid.Column="0"
                       x:Name="dgInstrumentGroups"
                       Background="Transparent"
                       IsReadOnly="True"
                       AutoGenerateColumns="False"
-                      ItemsSource="{Binding Groups}">
+                      ItemsSource="{Binding Containers}">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Name" Binding="{Binding Group.Name}" Width=".2*"
+                    <DataGridTextColumn Header="Name" Binding="{Binding Container.Name}" Width=".2*"
                                         ElementStyle="{StaticResource DataGridTextBlockStyle}"/>
                     <DataGridTextColumn Header="OpenPnL" Binding="{Binding CurrencyOpenPnL}" Width="72"
                                         ElementStyle="{StaticResource DataGridTextBlockStyle}"/>
                     <DataGridTextColumn Header="FixedPnL" Binding="{Binding FixedPnL}" Width="72"
                                         ElementStyle="{StaticResource DataGridTextBlockStyle}"/>
-
-                    <DataGridTemplateColumn Header="Options" Width="1*">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <ListView Background="Transparent" BorderBrush="Transparent" ItemsSource="{Binding Instruments}"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
+
+            <DataGrid Grid.Column="1" ItemsSource="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem.Instruments}"
+                      Background="Transparent" 
+                      IsReadOnly="True"
+                      AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Name" Binding="{Binding Instrument.Name}" 
+                                        Width="1*"
+                                        ElementStyle="{StaticResource DataGridTextBlockStyle}"/>
+                    <DataGridTextColumn Header="Position" Binding="{Binding Position.CurrentVolume}" 
+                                        Width=".5*"
+                                        ElementStyle="{StaticResource DataGridTextBlockStyle}"/>
+                    <DataGridTextColumn Header="Avg."
+                                        Width=".5*"
+                                        Binding="{Binding Position.AverageFilledPrice}"
+                                        ElementStyle="{StaticResource DataGridTextBlockStyle}"/>
+                    <DataGridTextColumn Header="OpenPnL" Binding="{Binding Position.CurrencyOpenPnL}" 
+                                        Width=".5*"
+                                        ElementStyle="{StaticResource DataGridTextBlockStyle}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            
+            <StackPanel Grid.Column="2" Orientation="Vertical">
+                <Button Content="запустить"
+                    Height="32"
+                    Style="{StaticResource BaseButtonStyle}"
+                    Command="{Binding StartGroupCommand}"
+                    CommandParameter="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem}"/>
+
+                <Button Content="изменить"
+                    Height="32"
+                    Command="{Binding EditInstrumentGroup}"
+                    CommandParameter="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem}"
+                    Style="{StaticResource BaseButtonStyle}"/>
+            </StackPanel>
         </Grid>
     </DockPanel>
 </Window>

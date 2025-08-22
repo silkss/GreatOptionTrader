@@ -1,6 +1,6 @@
-﻿using GreatOptionTrader.Commands;
+﻿using Connectors.IB;
+using GreatOptionTrader.Commands;
 using GreatOptionTrader.ViewModels;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 
@@ -10,17 +10,14 @@ namespace GreatOptionTrader.Views;
 /// </summary>
 public partial class EditInstrumentGroupView : Window {
     public EditInstrumentGroupView (
-        GroupViewModel vm, 
-        ObservableCollection<string> accounts,
-        SendOrderCommand sendOrderCommand,
-        CancelOrderCommand cancelOrderCommand,
-        RequestOptionCommand requestOptionCommand) {
+        OptionStrategyContainerViewModel vm, 
+        InteractiveBroker broker) {
         InitializeComponent();
         DataContext = vm;
-        cbAccounts.ItemsSource = accounts;
-        tbnCancelOrder.Command = cancelOrderCommand;
-        btnRequest.Command = requestOptionCommand;
-        btnSendOrder.Command = sendOrderCommand;
+        cbAccounts.ItemsSource = broker.Accounts;
+        tbnCancelOrder.Command = new CancelOrderCommand(broker);
+        btnRequest.Command = new RequestOptionCommand(broker);
+        btnSendOrder.Command = new SendOrderCommand(broker);
     }
 
     protected override void OnClosing (CancelEventArgs e) {

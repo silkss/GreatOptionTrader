@@ -2,7 +2,7 @@
 using GreatOptionTrader.Views;
 
 namespace GreatOptionTrader.Commands;
-public class CreateGroupCommand (InstrumentGroupRepository repository) : Base.Command {
+public class CreateGroupCommand (OptionStrategiesContainersRepository repository) : Base.Command {
     public override bool CanExecute (object? parameter) => true;
 
     public override void Execute (object? parameter) {

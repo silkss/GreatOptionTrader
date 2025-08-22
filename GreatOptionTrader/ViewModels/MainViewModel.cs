@@ -1,41 +1,28 @@
-﻿using GreatOptionTrader.Commands;
-using GreatOptionTrader.Models;
-using GreatOptionTrader.Services.Connectors;
+﻿using Connectors.IB;
+using GreatOptionTrader.Commands;
 using GreatOptionTrader.Services.Repositories;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace GreatOptionTrader.ViewModels;
 public class MainViewModel {
-    private readonly InstrumentGroupRepository instrumentGroupsRepository;
+    private readonly OptionStrategiesContainersRepository optionStrategiesContainersRepository;
 
     public MainViewModel (
         InteractiveBroker broker,
-        InstrumentGroupRepository instrumentGroupsRepository,
-        ObservableCollection<string> accounts) {
+        OptionStrategiesContainersRepository optionStrategiesContainersRepository) {
 
         Connect = new ConnectCommand(broker);
         StartGroupCommand = new StartGroupCommand(broker);
-        SendOrderCommand = new SendOrderCommand(broker);
-        CancelOrderCommand = new CancelOrderCommand(broker);
 
-        RequestOptionCommand = new RequestOptionCommand(broker);
-        CreateGroup = new CreateGroupCommand(instrumentGroupsRepository);
-        this.instrumentGroupsRepository = instrumentGroupsRepository;
-        EditInstrumentGroup = new EditInstrumentGroupCommand(
-            accounts, 
-            SendOrderCommand, 
-            CancelOrderCommand,
-            RequestOptionCommand);
+        this.optionStrategiesContainersRepository = optionStrategiesContainersRepository;
+        CreateGroup = new CreateGroupCommand(optionStrategiesContainersRepository);
+        EditInstrumentGroup = new EditOptionStrategiesContainerCommand(broker);
     }
 
     public ConnectCommand Connect { get; } 
     public StartGroupCommand StartGroupCommand { get; } 
-    public SendOrderCommand SendOrderCommand { get; } 
-    public CancelOrderCommand CancelOrderCommand { get; }
-    public RequestOptionCommand RequestOptionCommand { get; } 
 
     public CreateGroupCommand CreateGroup { get; }
-    public ObservableCollection<GroupViewModel> Groups => instrumentGroupsRepository.Items;
-    public EditInstrumentGroupCommand EditInstrumentGroup { get; }
+    public ObservableCollection<OptionStrategyContainerViewModel> Containers => optionStrategiesContainersRepository.ContainerViewModels;
+    public EditOptionStrategiesContainerCommand EditInstrumentGroup { get; }
 }

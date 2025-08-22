@@ -30,39 +30,32 @@ namespace IBApi
             processMsgsDecoder = new EDecoder(eClientSocket.ServerVersion, eClientSocket.Wrapper, eClientSocket);
         }
 
-        public void Start()
-        {
-            new Thread(() =>
-                {
-                    try
-                    {
-                        while (eClientSocket.IsConnected())
-                        {
-                            if (eClientSocket.IsDataAvailable() && !putMessageToQueue())
-                            {
-                                eClientSocket.eDisconnect();
-                                break;
-                            }
-
-                            // Poll here will return true if new data is available or connection is broken.
-                            if (eClientSocket.Poll(1000) && !eClientSocket.IsDataAvailable()) // The connection is broken.
-                            {
-                                // Throw 10054 socket error - An existing connection was forcibly closed by the remote host.
-                                throw new System.Net.Sockets.SocketException(10054);
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        if (eClientSocket.IsConnected())
-                        {
-                            eClientSocket.Wrapper.error(ex);
+        public EReader Start () {
+            new Thread(() => {
+                try {
+                    while (eClientSocket.IsConnected()) {
+                        if (eClientSocket.IsDataAvailable() && !putMessageToQueue()) {
                             eClientSocket.eDisconnect();
+                            break;
+                        }
+
+                        // Poll here will return true if new data is available or connection is broken.
+                        if (eClientSocket.Poll(1000) && !eClientSocket.IsDataAvailable()) // The connection is broken.
+                        {
+                            // Throw 10054 socket error - An existing connection was forcibly closed by the remote host.
+                            throw new System.Net.Sockets.SocketException(10054);
                         }
                     }
-                    eReaderSignal.issueSignal();
-                })
-                { IsBackground = true }.Start();
+                }
+                catch (Exception ex) {
+                    if (eClientSocket.IsConnected()) {
+                        eClientSocket.Wrapper.error(ex);
+                        eClientSocket.eDisconnect();
+                    }
+                }
+                eReaderSignal.issueSignal();
+            }) { IsBackground = true }.Start();
+            return this;
         }
 
         private EMessage getMsg()

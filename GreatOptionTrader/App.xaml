@@ -20,14 +20,14 @@
             <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
-        
-        
+
         <Style TargetType="TextBox" x:Key="BaseTextBoxStyle">
             <Setter Property="Margin" Value="{StaticResource BaseMargin}"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="BorderThickness" Value="0,0,0,2"/>
         </Style>
+        
         <Style TargetType="Button" x:Key="BaseButtonStyle">
             <Setter Property="Margin" Value="{StaticResource BaseMargin}"/>
         </Style>
@@ -51,7 +51,13 @@
             <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
         
-        
+        <Style TargetType="ComboBox" x:Key="BaseComboBoxStyle">
+            <Setter Property="ItemContainerStyle" Value="{StaticResource BaseComboBoxItemStyle}"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value ="Center"/>
+            <Setter Property="Margin" Value="{StaticResource BaseMargin}"/>
+        </Style>
+
         <ObjectDataProvider 
             x:Key="TradeDirectionToItemSource" MethodName="GetValues" 
             ObjectType="{x:Type system:Enum}">
@@ -59,82 +65,5 @@
                 <x:Type TypeName="enums:TradeDirection"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
-
-        <Style TargetType="ComboBox" x:Key="BaseComboBoxStyle">
-            <Setter Property="ItemContainerStyle" Value="{StaticResource BaseComboBoxItemStyle}"/>
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-            <Setter Property="VerticalContentAlignment" Value ="Center"/>
-            <Setter Property="Margin" Value="{StaticResource BaseMargin}"/>
-        </Style>
-        
-        <DataTemplate DataType="{x:Type models:OptionModel}" x:Key="BaseInsturmentInfo">
-            <UniformGrid Columns="1">
-                <UniformGrid Rows="1">
-                    <TextBlock Text="name:" Style="{StaticResource BaseTextBlockStyle}" />
-                    <TextBlock Text="{Binding Name}" Style="{StaticResource BaseTextBlockStyle}"/>
-                </UniformGrid>
-                <UniformGrid Rows="1">
-                    <TextBlock Text="expiration:" Style="{StaticResource BaseTextBlockStyle}" />
-                    <TextBlock Text="{Binding ExpirationDate, StringFormat=d, ConverterCulture=RU-ru}" Style="{StaticResource BaseTextBlockStyle}"/>
-                </UniformGrid>
-                <UniformGrid Rows="1">
-                    <TextBlock Text="multiplier:" Style="{StaticResource BaseTextBlockStyle}" />
-                    <TextBlock Text="{Binding Multiplier}" Style="{StaticResource BaseTextBlockStyle}"/>
-                </UniformGrid>
-            </UniformGrid>
-        </DataTemplate>
-
-        <DataTemplate DataType="{x:Type vm:GroupViewModel}">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="42"/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0"
-                           Text="{Binding Group.Id}"
-                           Style="{StaticResource BaseTextBlockStyle}"/>
-                <TextBlock Grid.Column="1"
-                           Text="{Binding Group.Name}"
-                           TextWrapping="Wrap"
-                           Style="{StaticResource BaseTextBlockStyle}"/>
-            </Grid>
-        </DataTemplate>
-
-        <DataTemplate DataType="{x:Type vm:InstrumentViewModel}">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="1*"/>
-                </Grid.ColumnDefinitions>
-                
-                <TextBlock Grid.Column="0"
-                           Text="{Binding Instrument.Name}"
-                           FontWeight="SemiBold"
-                           TextAlignment="Left"
-                           Style="{StaticResource BaseTextBlockStyle}"/>
-
-                <TextBlock Grid.Column="1"
-                           Style="{StaticResource BaseTextBlockStyle}"
-                           TextAlignment="Right"
-                           Text="{Binding Position.CurrentVolume}"/>
-                
-                <TextBlock Grid.Column="2"
-                           Style="{StaticResource BaseTextBlockStyle}"
-                           TextAlignment="Right"
-                           Text="{Binding Position.CurrencyOpenPnL}"/>
-
-            </Grid>
-        </DataTemplate>
-
-        <DataTemplate DataType="{x:Type core:Order}">
-            <UniformGrid Rows="1">
-                <TextBlock Text="{Binding BrokerId}" Style="{StaticResource BaseTextBlockStyle}"/>
-                <TextBlock Text="{Binding Status}" Style="{StaticResource BaseTextBlockStyle}"/>
-                <TextBlock Text="{Binding Quantity}" Style="{StaticResource BaseTextBlockStyle}"/>
-                <TextBlock Text="{Binding FilledVolume}" Style="{StaticResource BaseTextBlockStyle}"/>
-                <TextBlock Text="{Binding LimitPrice}" Style="{StaticResource BaseTextBlockStyle}"/>
-            </UniformGrid>
-        </DataTemplate>
     </Application.Resources>
 </Application>

@@ -1,17 +1,17 @@
-﻿using GreatOptionTrader.Services.Connectors;
+﻿using Connectors.IB;
 using GreatOptionTrader.ViewModels;
 using System;
 
 namespace GreatOptionTrader.Commands;
 public class SendOrderCommand (InteractiveBroker broker) : Base.Command {
     public override bool CanExecute (object? parameter) => broker.IsConnected()
-        && parameter is InstrumentViewModel ivm
+        && parameter is OptionStrategyViewModel ivm
         && ivm.WantedPrice > 0m
         && ivm.WantedVolume > 0m
         && ivm.OpenOrder == null;
 
     public override void Execute (object? parameter) {
-        if (parameter is not InstrumentViewModel ivm) {
+        if (parameter is not OptionStrategyViewModel ivm) {
             return;
         }
 

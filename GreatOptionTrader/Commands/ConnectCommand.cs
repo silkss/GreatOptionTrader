@@ -1,4 +1,4 @@
-﻿using GreatOptionTrader.Services.Connectors;
+﻿using Connectors.IB;
 
 namespace GreatOptionTrader.Commands;
 public class ConnectCommand (InteractiveBroker broker) : Base.Command {

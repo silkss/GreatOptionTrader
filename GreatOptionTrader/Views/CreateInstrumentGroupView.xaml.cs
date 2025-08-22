@@ -1,4 +1,6 @@
-﻿using GreatOptionTrader.Services.Repositories;
+﻿using GreatOptionTrader.Models;
+using GreatOptionTrader.Services.Repositories;
+using System;
 using System.Windows;
 
 namespace GreatOptionTrader.Views;
@@ -6,9 +8,9 @@ namespace GreatOptionTrader.Views;
 /// Логика взаимодействия для CreateInstrumentGroupView.xaml
 /// </summary>
 public partial class CreateInstrumentGroupView : Window {
-    private readonly InstrumentGroupRepository repository;
+    private readonly OptionStrategiesContainersRepository repository;
 
-    public CreateInstrumentGroupView (InstrumentGroupRepository repository) {
+    public CreateInstrumentGroupView (OptionStrategiesContainersRepository repository) {
         InitializeComponent();
         this.repository = repository;
     }
@@ -24,8 +26,12 @@ public partial class CreateInstrumentGroupView : Window {
         }
 
         var name = tbName.Text.Replace('\n', ' ');
-
-        repository.CreateByName(name);
+        var container = new OptionStrategiesContainer() {
+            Guid = Guid.NewGuid(),
+            Name = name,
+            Strategies = []
+        };
+        repository.Create(container);
         DialogResult = true;
     }
 }

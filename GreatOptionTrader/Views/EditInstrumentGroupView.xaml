@@ -76,6 +76,13 @@
                       x:Name="lvInstruments"
                       ItemsSource="{Binding Instruments}">
                 <DataGrid.Columns>
+                    <DataGridTextColumn Header="Bid" Binding="{Binding BidPrice}"
+                                        ElementStyle="{StaticResource DataGridTextBlockStyle}"
+                                        Width=".25*"/>
+                    <DataGridTextColumn Header="Ask" Binding="{Binding AskPrice}" 
+                                        ElementStyle="{StaticResource DataGridTextBlockStyle}"
+                                        Width=".25*"/>
+                    
                     <DataGridTextColumn Header="Инструмент" Binding="{Binding Instrument.Name}" 
                                         Width="1*"
                                         ElementStyle="{StaticResource DataGridTextBlockStyle}"/>
@@ -91,6 +98,7 @@
                     <DataGridTextColumn Header="Открытый ПиУ" Binding="{Binding Position.CurrencyOpenPnL}"
                                         ElementStyle="{StaticResource DataGridTextBlockStyle}"
                                         Width=".5*"/>
+                    
 
                     <DataGridTemplateColumn Header="Открытый ордер" Width="1.5*">
                         <DataGridTemplateColumn.CellTemplate>
