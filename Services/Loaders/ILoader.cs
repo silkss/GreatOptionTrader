@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GreatOptionTrader.Services.Loaders;
+namespace Services.Loaders;
 
 public interface ILoader<TItem> {
     IEnumerable<TItem> LoadAll ();

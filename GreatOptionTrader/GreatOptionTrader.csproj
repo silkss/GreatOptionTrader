@@ -18,6 +18,11 @@
 		<ProjectReference Include="..\client\CSharpAPI.csproj" />
 		<ProjectReference Include="..\Connectors\Connectors.csproj" />
 		<ProjectReference Include="..\Core\Core.csproj" />
+		<ProjectReference Include="..\Services\Services.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="ResourceDictionaries\" />
 	</ItemGroup>
 
 </Project>

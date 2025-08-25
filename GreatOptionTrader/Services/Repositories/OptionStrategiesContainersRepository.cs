@@ -1,7 +1,7 @@
 ﻿using Connectors.IB;
 using GreatOptionTrader.Models;
-using GreatOptionTrader.Services.Loaders;
 using GreatOptionTrader.ViewModels;
+using Services.Loaders;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Threading;

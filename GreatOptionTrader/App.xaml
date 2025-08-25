@@ -8,62 +8,39 @@
              xmlns:enums="clr-namespace:Core;assembly=Core"
              xmlns:core="clr-namespace:Core;assembly=Core">
     <Application.Resources>
-        <Thickness x:Key="BaseMargin" Left="4" Top="4" Right="4" Bottom="4"/>
-        <system:Double x:Key="BaseFontSize">14</system:Double>
-        
-        <Style TargetType="TextBlock" x:Key="BaseTextBlockStyle">
-            <Setter Property="FontSize" Value="{StaticResource BaseFontSize}"/>
-            <Setter Property="Margin" Value="{StaticResource BaseMargin}"/>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="BaseStyleValues.xaml" />
+                <ResourceDictionary Source="StreatchedExpanderStyle.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
 
-        <Style TargetType="TextBlock" x:Key="DataGridTextBlockStyle" BasedOn="{StaticResource BaseTextBlockStyle}">
-            <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
+            <ObjectDataProvider x:Key="TradeDirectionToItemSource" MethodName="GetValues" ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="enums:TradeDirection"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
 
-        <Style TargetType="TextBox" x:Key="BaseTextBoxStyle">
-            <Setter Property="Margin" Value="{StaticResource BaseMargin}"/>
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="BorderThickness" Value="0,0,0,2"/>
-        </Style>
-        
-        <Style TargetType="Button" x:Key="BaseButtonStyle">
-            <Setter Property="Margin" Value="{StaticResource BaseMargin}"/>
-        </Style>
+            <DataTemplate DataType="{x:Type vm:OptionStrategyViewModel}">
+                <UniformGrid Rows="1">
+                    <TextBlock Text="{Binding Instrument.Name}" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding Position.CurrentVolume}" TextAlignment="Right"/>
+                    <TextBlock Text="{Binding Position.CurrencyOpenPnL}" TextAlignment="Right"/>
+                </UniformGrid>
+            </DataTemplate>
 
-        <Style TargetType="DataGrid">
-            <Setter Property="Margin" Value="{StaticResource BaseMargin}"/>
-            <Setter Property="HeadersVisibility" Value="Column"/>
-        </Style>
-
-        <Style TargetType="ListViewItem">
-            <Setter Property="Focusable" Value="False"/>
-            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-        </Style>
-        
-        <Style TargetType="ListView">
-            <Setter Property="Margin" Value="{StaticResource BaseMargin}"/>
-        </Style>
-
-        <Style x:Key="BaseComboBoxItemStyle" TargetType="ComboBoxItem">
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-        </Style>
-        
-        <Style TargetType="ComboBox" x:Key="BaseComboBoxStyle">
-            <Setter Property="ItemContainerStyle" Value="{StaticResource BaseComboBoxItemStyle}"/>
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-            <Setter Property="VerticalContentAlignment" Value ="Center"/>
-            <Setter Property="Margin" Value="{StaticResource BaseMargin}"/>
-        </Style>
-
-        <ObjectDataProvider 
-            x:Key="TradeDirectionToItemSource" MethodName="GetValues" 
-            ObjectType="{x:Type system:Enum}">
-            <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="enums:TradeDirection"/>
-            </ObjectDataProvider.MethodParameters>
-        </ObjectDataProvider>
+            <DataTemplate DataType="{x:Type vm:OptionStrategyContainerViewModel}">
+                <Expander Style="{StaticResource StreatchedExpanderStyle}">
+                    <Expander.Header>
+                        <UniformGrid Rows="1" Grid.Row="0">
+                            <TextBlock Text="{Binding Container.Name}" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding CurrencyOpenPnL}" TextAlignment="Right"/>
+                        </UniformGrid>
+                    </Expander.Header>
+                    <Expander.Content>
+                        <ItemsControl Grid.Row="1" ItemsSource="{Binding Instruments}"/>
+                    </Expander.Content>
+                </Expander>
+            </DataTemplate>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>
