@@ -33,11 +33,11 @@
                     Style="{StaticResource BaseButtonStyle}"
                     Command="{Binding StartGroupCommand}"
                     CommandParameter="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem}"/>
+
                 <Button Content="старт всё"
                     Height="32"
                     Style="{StaticResource BaseButtonStyle}"
-                    Command="{Binding StartGroupCommand}"
-                    CommandParameter="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem}"/>
+                    Command="{Binding StartAllContainers}"/>
 
                 <Button Content="изменить"
                     Height="32"

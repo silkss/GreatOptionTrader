@@ -7,9 +7,11 @@
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:enums="clr-namespace:Core;assembly=Core"
              xmlns:core="clr-namespace:Core;assembly=Core">
+
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="ConvertersDictionary.xaml" />
                 <ResourceDictionary Source="BaseStyleValues.xaml" />
                 <ResourceDictionary Source="StreatchedExpanderStyle.xaml"/>
             </ResourceDictionary.MergedDictionaries>
@@ -20,20 +22,41 @@
                 </ObjectDataProvider.MethodParameters>
             </ObjectDataProvider>
 
+            <Style TargetType="TextBlock">
+                <Setter Property="Padding" Value="4,4,4,4"/>
+            </Style>
+            
             <DataTemplate DataType="{x:Type vm:OptionStrategyViewModel}">
-                <UniformGrid Rows="1">
-                    <TextBlock Text="{Binding Instrument.Name}" FontWeight="SemiBold"/>
-                    <TextBlock Text="{Binding Position.CurrentVolume}" TextAlignment="Right"/>
-                    <TextBlock Text="{Binding Position.CurrencyOpenPnL}" TextAlignment="Right"/>
-                </UniformGrid>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="23"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="1" Text="{Binding Instrument.Name}" FontWeight="SemiBold"/>
+                    <TextBlock Grid.Column="2" Text="{Binding Position.CurrentVolume}" TextAlignment="Right"/>
+                    <TextBlock Grid.Column="3" Text="{Binding Position.AverageFilledPrice}" TextAlignment="Right"/>
+                    <TextBlock Grid.Column="4" Text="{Binding Position.CurrencyOpenPnL}"
+                               Background="{Binding Position.CurrencyOpenPnL, Converter={StaticResource PnLToBrushConv}}"
+                               FontWeight="SemiBold"
+                               TextAlignment="Right"/>
+                </Grid>
             </DataTemplate>
 
             <DataTemplate DataType="{x:Type vm:OptionStrategyContainerViewModel}">
-                <Expander Style="{StaticResource StreatchedExpanderStyle}">
+                <Expander Style="{StaticResource StreatchedExpanderStyle}"
+                          BorderBrush="{Binding IsStarted, Converter={StaticResource IsStrartedConv}}"
+                          BorderThickness="4, 0, 0, 0"
+                          Padding="4,0,0,0">
                     <Expander.Header>
                         <UniformGrid Rows="1" Grid.Row="0">
                             <TextBlock Text="{Binding Container.Name}" FontWeight="SemiBold"/>
-                            <TextBlock Text="{Binding CurrencyOpenPnL}" TextAlignment="Right"/>
+                            <TextBlock Text="{Binding CurrencyOpenPnL}"
+                                       Background="{Binding CurrencyOpenPnL, Converter={StaticResource PnLToBrushConv}}"
+                                       TextAlignment="Right"
+                                       FontWeight="SemiBold"/>
                         </UniformGrid>
                     </Expander.Header>
                     <Expander.Content>
