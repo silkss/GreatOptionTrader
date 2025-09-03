@@ -1,0 +1,101 @@
+﻿<Window x:Class="GreatOptionTrader.Views.RequestOptionView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GreatOptionTrader.Views"
+        mc:Ignorable="d"
+        Title="RequestOptionView" 
+        Height="450" Width="400"
+        MinHeight="450" MinWidth="400">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition />
+            <RowDefinition Height="42"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <Grid Height="{StaticResource StackPanelElementHeight}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="name:" Style="{StaticResource BaseTextBlockStyle}"/>
+                <TextBox Grid.Column="1" x:Name="tbOptionName" Style="{StaticResource BaseTextBoxStyle}"/>
+            </Grid>
+
+            <Grid Height="{StaticResource StackPanelElementHeight}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="exchange:" Style="{StaticResource BaseTextBlockStyle}"/>
+                <TextBox Grid.Column="1" x:Name="tbOptionExchange" Style="{StaticResource BaseTextBoxStyle}"/>
+            </Grid>
+            <Button Content="Request"
+                    Click="btnRequestClicked"
+                    Style="{StaticResource BaseButtonStyle}"/>
+        </StackPanel>
+        
+        <StackPanel Grid.Row="1" x:Name="spSelectedOption">
+            <Grid Height="{StaticResource StackPanelElementHeight}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="id:" 
+                           Style="{StaticResource BaseTextBlockStyle}"/>
+                <TextBlock Grid.Column="1" Text="{Binding Id}"
+                           TextAlignment="Center"
+                           Style="{StaticResource BaseTextBlockStyle}"/>
+            </Grid>
+            <Grid Height="{StaticResource StackPanelElementHeight}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="symbol:"
+                           Style="{StaticResource BaseTextBlockStyle}"/>
+                <TextBlock Grid.Column="1" Text="{Binding Symbol}"
+                           TextAlignment="Center"
+                           Style="{StaticResource BaseTextBlockStyle}"/>
+            </Grid>
+            <Grid Height="{StaticResource StackPanelElementHeight}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="expiration:"
+                           Style="{StaticResource BaseTextBlockStyle}"/>
+                <TextBlock Grid.Column="1" Text="{Binding ExpirationDate, StringFormat=dd.MM.yyyy}"
+                           TextAlignment="Center"
+                           Style="{StaticResource BaseTextBlockStyle}"/>
+            </Grid>
+            <Grid Height="{StaticResource StackPanelElementHeight}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="right:"/>
+                <TextBlock Grid.Column="1" Text="{Binding Right}"
+                           TextAlignment="Center"
+                           Style="{StaticResource BaseTextBlockStyle}"/>
+            </Grid>
+            <Grid Height="{StaticResource StackPanelElementHeight}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="trading class:"/>
+                <TextBlock Grid.Column="1" Text="{Binding TradingClass}"
+                           TextAlignment="Center"
+                           Style="{StaticResource BaseTextBlockStyle}"/>
+            </Grid>
+        </StackPanel>
+
+        <Button Content="Create" Grid.Row="2"
+                Click="create" Style="{StaticResource BaseButtonStyle}"/>
+    </Grid>
+</Window>

@@ -22,28 +22,66 @@
         <Grid DockPanel.Dock="Bottom">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="72" />
+                <ColumnDefinition Width="42" />
             </Grid.ColumnDefinitions>
 
             <ListView Grid.Column="0" x:Name="dgInstrumentGroups" ItemsSource="{Binding Containers}"/>
 
             <StackPanel Grid.Column="2" Orientation="Vertical">
-                <Button Content="запустить"
-                    Height="32"
-                    Style="{StaticResource BaseButtonStyle}"
-                    Command="{Binding StartGroupCommand}"
-                    CommandParameter="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem}"/>
+                <Button Width="32" Height="32"
+                        Style="{StaticResource BaseButtonStyle}"
+                        Command="{Binding StartAllContainers}"
+                        ToolTip="Запустить все контейнеры">
+                    <Button.Content>
+                        <Path Data="M 1,1 L 10,8 L 1,16 Z M 10,1 L 20, 8 L 10,16 Z"
+                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Control}, Path=Foreground}" 
+                              Fill="{Binding RelativeSource={RelativeSource AncestorType=Control}, Path=Foreground}" 
+                              StrokeThickness="2"
+                              StrokeLineJoin="Round" />
+                    </Button.Content>
+                </Button>
 
-                <Button Content="старт всё"
-                    Height="32"
-                    Style="{StaticResource BaseButtonStyle}"
-                    Command="{Binding StartAllContainers}"/>
+                <Button Width="32" Height="32"
+                        Style="{StaticResource BaseButtonStyle}"
+                        Command="{Binding StartContainerCommand}"
+                        ToolTip="Запустить выбранный контейнер"
+                        CommandParameter="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem}">
+                    <Button.Content>
+                        <Path Data="M 1, 1 L 15, 10 L 1,20 Z"
+                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Control}, Path=Foreground}" 
+                              Fill="{Binding RelativeSource={RelativeSource AncestorType=Control}, Path=Foreground}" 
+                              StrokeThickness="2"
+                              StrokeLineJoin="Round" />
+                    </Button.Content>
+                </Button>
 
-                <Button Content="изменить"
-                    Height="32"
-                    Command="{Binding EditInstrumentGroup}"
-                    CommandParameter="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem}"
-                    Style="{StaticResource BaseButtonStyle}"/>
+                <Button Width="32" Height="32"
+                        Style="{StaticResource BaseButtonStyle}"
+                        Command="{Binding AddOptionStrategyCommand}"
+                        CommandParameter="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem}">
+                    <Button.Content>
+                        <Path Stroke="{Binding RelativeSource={RelativeSource AncestorType=Control}, Path=Foreground}"
+                              StrokeThickness="4">
+                            <Path.Data>
+                                <GeometryGroup>
+                                    <LineGeometry StartPoint="10, 1" EndPoint="10,20"/>
+                                    <LineGeometry StartPoint="1, 10" EndPoint="20, 10"/>
+                                </GeometryGroup>
+                            </Path.Data>
+                        </Path>
+                    </Button.Content>
+                </Button>
+                <Button Width="32" Height="32"
+                        Command="{Binding EditInstrumentGroup}"
+                        CommandParameter="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem}"
+                        Style="{StaticResource BaseButtonStyle}"
+                        ToolTip="Изменить контейнер \ добавить стратегии.">
+                    <Button.Content>
+                        <Ellipse Width="16" Height="16" 
+                                 StrokeThickness="4"
+                                 Stroke="{Binding RelativeSource={RelativeSource AncestorType=Control}, Path=Foreground}" />
+                    </Button.Content>
+                </Button>
             </StackPanel>
         </Grid>
     </DockPanel>

@@ -9,6 +9,7 @@ public class PositionViewModel : ObservableObject {
     private decimal previousOpeningPrice;
     private decimal openPnL;
     private decimal currencyOpenPnL;
+    private decimal currencyFixedPnL;
 
     public decimal CurrentVolume { get; private set; }
     public decimal AbsoluteCurrentVolume => Math.Abs(CurrentVolume);
@@ -19,6 +20,7 @@ public class PositionViewModel : ObservableObject {
     public decimal AverageFilledPrice { get; private set; }
     public decimal CommissionCurrency { get; private set; }
     public decimal FixedPnL { get; private set; }
+    public decimal CurrencyFixedPnL { get => currencyFixedPnL; set => Set(ref currencyFixedPnL, value); }
     public decimal OpenPnL { 
         get => openPnL;
         set => Set(ref openPnL, value);
@@ -111,6 +113,8 @@ public class PositionViewModel : ObservableObject {
             }
         }
     }
+
+    public void UpdateFixedPnL (int multiplier) => CurrencyFixedPnL = FixedPnL * multiplier;
 
     public decimal CalculateShortPnL(decimal buyPrice, int multiplier) {
         return CalculatePnL(buyPrice, AverageFilledPrice) * AbsoluteCurrentVolume * multiplier;

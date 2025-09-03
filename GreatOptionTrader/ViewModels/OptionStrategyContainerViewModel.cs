@@ -1,6 +1,7 @@
 ﻿using Connectors.IB;
 using Core;
 using GreatOptionTrader.Models;
+using GreatOptionTrader.ViewModels.Base;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,7 +9,7 @@ using System.Windows.Threading;
 
 namespace GreatOptionTrader.ViewModels;
 
-public class OptionStrategyContainerViewModel : Base.ObservableObject {
+public class OptionStrategyContainerViewModel : BaseOptionStrategyViewModel {
     private readonly InteractiveBroker broker;
     private readonly Dispatcher dispatcher;
     private string? requestedOptionName;
@@ -22,7 +23,7 @@ public class OptionStrategyContainerViewModel : Base.ObservableObject {
         }
     }
 
-    private OptionStrategyViewModel createInstrumentViewModel(OptionStrategy strategy) {
+    private OptionStrategyViewModel createOptionStrategyViewModel(OptionStrategy strategy) {
         return new OptionStrategyViewModel(
             strategy: strategy, 
             broker: broker);
@@ -31,19 +32,19 @@ public class OptionStrategyContainerViewModel : Base.ObservableObject {
     public OptionStrategyContainerViewModel (
         OptionStrategiesContainer container,
         InteractiveBroker broker,
-        Dispatcher dispatcher) {
+        Dispatcher dispatcher) : base(container.Orders) {
         this.dispatcher = dispatcher;
         Container = container;
         this.broker = broker;
-        this.Instruments = new ObservableCollection<OptionStrategyViewModel>(container.Strategies.Select(createInstrumentViewModel));
-        this.broker.OptionRequestedEvent += OnInstrumentUpdated;
+        this.OptionStrategies = new ObservableCollection<OptionStrategyViewModel>(container.Strategies.Select(createOptionStrategyViewModel));
     }
 
     public bool IsStarted { get; set; }
     public decimal CurrencyOpenPnL { get; private set; }
-    public decimal FixedPnL { get; private set; }
+    public decimal CurrencyFixedPnL { get; private set; }
+    public decimal CurrencyTotalPnL { get; private set; }
 
-    public ObservableCollection<OptionStrategyViewModel> Instruments { get; }
+    public ObservableCollection<OptionStrategyViewModel> OptionStrategies { get; }
 
     public string? RequestedOptionName {
         get => requestedOptionName;
@@ -66,24 +67,33 @@ public class OptionStrategyContainerViewModel : Base.ObservableObject {
 
     public OptionStrategiesContainer Container { get; }
 
+    public override Option Instrument => Container.Instrument;
+
     public void Start (InteractiveBroker broker) {
         if (IsStarted) { return; }
+        broker.SubscribeOnMarketData(this);
 
-        foreach (var instrumentViewModel in Instruments) {
-            broker.SubscribeOnMarketData(instrumentViewModel);
+        foreach (var optionStrategy in OptionStrategies) {
+            broker.SubscribeOnMarketData(optionStrategy);
         }
 
         IsStarted = true;
         RaisePropertyChanged(nameof(IsStarted));
         pnlUpdaterWorker = makePnLUpdaterWorker();
     }
-
+    public void AddStrategy(OptionStrategy strategy) {
+        Container.Strategies.Add(strategy);
+        var vm = createOptionStrategyViewModel(strategy);
+        dispatcher.Invoke(() => {
+            OptionStrategies.Add(vm);
+        });
+    }
     public void UpdatePnL () {
-        decimal currencyOpenPnl = 0m;
-        decimal fixedPnL = 0m;
-        foreach (var ivm in Instruments) {
+        decimal currencyOpenPnl = 0m, currencyFixedPnL = 0m, currencyTotalPnL;
+
+        foreach (var ivm in OptionStrategies) {
             currencyOpenPnl += ivm.Position.CurrencyOpenPnL;
-            fixedPnL += ivm.Position.FixedPnL;
+            currencyFixedPnL += ivm.Position.CurrencyFixedPnL;
         }
 
         if (CurrencyOpenPnL != currencyOpenPnl) {
@@ -91,24 +101,15 @@ public class OptionStrategyContainerViewModel : Base.ObservableObject {
             RaisePropertyChanged(nameof(CurrencyOpenPnL));
         }
 
-        if (FixedPnL != fixedPnL ) {
-            FixedPnL = fixedPnL;
-            RaisePropertyChanged(nameof(FixedPnL));
+        if (CurrencyFixedPnL != currencyFixedPnL) {
+            CurrencyFixedPnL = currencyFixedPnL;
+            RaisePropertyChanged(nameof(CurrencyFixedPnL));
         }
-    }
 
-    public void OnInstrumentUpdated(int requestId, Option option) {
-        if (GetHashCode() != requestId) return;
-        if (Instruments.Any(instrument => instrument.Instrument.Id == option.Id)) return;
-
-        var optionStrategy = new OptionStrategy() { Instrument = option, Orders = [] };
-        Container.Strategies.Add(optionStrategy);
-
-        var optionVM = createInstrumentViewModel(optionStrategy);
-        dispatcher.Invoke(() => Instruments.Add(optionVM));
-
-        if (IsStarted) {
-            broker.SubscribeOnMarketData(optionVM);
+        currencyTotalPnL = CurrencyOpenPnL + CurrencyFixedPnL;
+        if (CurrencyTotalPnL != currencyTotalPnL) {
+            CurrencyTotalPnL = currencyTotalPnL;
+            RaisePropertyChanged(nameof(CurrencyTotalPnL));
         }
     }
 }

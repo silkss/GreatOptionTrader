@@ -12,18 +12,19 @@ public class MainViewModel {
         OptionStrategiesContainersRepository optionStrategiesContainersRepository) {
 
         Connect = new ConnectCommand(broker);
-        StartGroupCommand = new StartGroupCommand(broker);
+        StartContainerCommand = new StartOptionStrategiesContainerCommand(broker);
 
         this.optionStrategiesContainersRepository = optionStrategiesContainersRepository;
-        CreateGroup = new CreateGroupCommand(optionStrategiesContainersRepository);
+        CreateGroup = new CreateGroupCommand(broker, optionStrategiesContainersRepository);
+        AddOptionStrategyCommand = new AddOptionStrategyCommand(broker);
         EditInstrumentGroup = new EditOptionStrategiesContainerCommand(broker);
         StartAllContainers = new StartAllContainerCommand(broker, optionStrategiesContainersRepository.ContainerViewModels);
     }
 
     public ConnectCommand Connect { get; } 
-    public StartGroupCommand StartGroupCommand { get; } 
+    public StartOptionStrategiesContainerCommand StartContainerCommand{ get; } 
     public StartAllContainerCommand StartAllContainers { get; }
-
+    public AddOptionStrategyCommand AddOptionStrategyCommand { get; }
     public CreateGroupCommand CreateGroup { get; }
     public ObservableCollection<OptionStrategyContainerViewModel> Containers => optionStrategiesContainersRepository.ContainerViewModels;
     public EditOptionStrategiesContainerCommand EditInstrumentGroup { get; }

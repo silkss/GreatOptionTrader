@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Connectors", "Connectors\Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "Services\Services.csproj", "{DAD63120-6121-4A2D-8A3B-2EB7C5884661}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Robin", "Robin\Robin.csproj", "{DCEB3DC2-AB17-4081-AB34-4613AA28AE3E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -85,6 +87,18 @@ Global
 		{DAD63120-6121-4A2D-8A3B-2EB7C5884661}.Release|x64.Build.0 = Release|Any CPU
 		{DAD63120-6121-4A2D-8A3B-2EB7C5884661}.Release|x86.ActiveCfg = Release|Any CPU
 		{DAD63120-6121-4A2D-8A3B-2EB7C5884661}.Release|x86.Build.0 = Release|Any CPU
+		{DCEB3DC2-AB17-4081-AB34-4613AA28AE3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCEB3DC2-AB17-4081-AB34-4613AA28AE3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCEB3DC2-AB17-4081-AB34-4613AA28AE3E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DCEB3DC2-AB17-4081-AB34-4613AA28AE3E}.Debug|x64.Build.0 = Debug|Any CPU
+		{DCEB3DC2-AB17-4081-AB34-4613AA28AE3E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DCEB3DC2-AB17-4081-AB34-4613AA28AE3E}.Debug|x86.Build.0 = Debug|Any CPU
+		{DCEB3DC2-AB17-4081-AB34-4613AA28AE3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCEB3DC2-AB17-4081-AB34-4613AA28AE3E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCEB3DC2-AB17-4081-AB34-4613AA28AE3E}.Release|x64.ActiveCfg = Release|Any CPU
+		{DCEB3DC2-AB17-4081-AB34-4613AA28AE3E}.Release|x64.Build.0 = Release|Any CPU
+		{DCEB3DC2-AB17-4081-AB34-4613AA28AE3E}.Release|x86.ActiveCfg = Release|Any CPU
+		{DCEB3DC2-AB17-4081-AB34-4613AA28AE3E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

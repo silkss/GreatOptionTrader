@@ -5,103 +5,45 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GreatOptionTrader.Views"
         mc:Ignorable="d"
-        Title="Модифицирование группы." Height="450" Width="800">
-
-
+        Title="Модифицирование группы." 
+        Height="450" Width="500"
+        MinHeight="450" MinWidth="500">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="42"/>
-            <RowDefinition Height="42"/>
-            <RowDefinition />
-        </Grid.RowDefinitions>
-
-        <Grid Grid.Row="0" Grid.Column="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-
-            <TextBox Grid.Column="0"
-                         Style="{StaticResource BaseTextBoxStyle}"
-                         Text="{Binding RequestedOptionName}"/>
-
-            <TextBox Grid.Column="1"
-                         Style="{StaticResource BaseTextBoxStyle}"
-                         Text="{Binding RequestedOptionExchange}"/>
-
-            <Button Content="Request" Grid.Column="2"
-                        x:Name="btnRequest"
-                        CommandParameter="{Binding}"
-                        Style="{StaticResource BaseButtonStyle}"/>
-        </Grid>
-
-        <UniformGrid Grid.Row="1" Rows="1">
-            <ComboBox Style="{StaticResource BaseComboBoxStyle}"
-                          x:Name="cbAccounts"
-                          SelectedItem="{Binding ElementName=lvInstruments, Path=SelectedItem.WantedAccount}"/>
-
-            <ComboBox Style="{StaticResource BaseComboBoxStyle}"
-                          ItemsSource="{Binding Source={StaticResource TradeDirectionToItemSource}}"
-                          SelectedItem="{Binding ElementName=lvInstruments, Path=SelectedItem.WantedDirection}"/>
-
-            <TextBox Style="{StaticResource BaseTextBoxStyle}"
-                         Text="{Binding ElementName=lvInstruments, Path=SelectedItem.WantedVolume, Mode=TwoWay}"/>
-
-            <TextBox Style="{StaticResource BaseTextBoxStyle}"
-                         Text="{Binding ElementName=lvInstruments, Path=SelectedItem.WantedPrice, Mode=TwoWay}"/>
-
-            <Button Content="SendOrder"
-                        x:Name="btnSendOrder"
-                        Style="{StaticResource BaseButtonStyle}"
-                        CommandParameter="{Binding ElementName=lvInstruments, Path=SelectedItem}"/>
-
-            <Button Content="CancelOrder"
-                        x:Name="tbnCancelOrder"
-                        CommandParameter="{Binding ElementName=lvInstruments, Path=SelectedItem}"
-                        Style="{StaticResource BaseButtonStyle}"/>
-
-        </UniformGrid>
-
-        <DataGrid Grid.Row="2" IsReadOnly="True" AutoGenerateColumns="False"
-                      x:Name="lvInstruments"
-                      ItemsSource="{Binding Instruments}">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Bid" Binding="{Binding BidPrice}"
-                                        ElementStyle="{StaticResource DataGridTextBlockStyle}"
-                                        Width=".25*"/>
-                <DataGridTextColumn Header="Ask" Binding="{Binding AskPrice}" 
-                                        ElementStyle="{StaticResource DataGridTextBlockStyle}"
-                                        Width=".25*"/>
-
-                <DataGridTextColumn Header="Инструмент" Binding="{Binding Instrument.Name}" 
-                                        Width="1*"
-                                        ElementStyle="{StaticResource DataGridTextBlockStyle}"/>
-
-                <DataGridTextColumn Header="Объем" Binding="{Binding Position.CurrentVolume}"
-                                        Width=".5*"
-                                        ElementStyle="{StaticResource DataGridTextBlockStyle}"/>
-
-                <DataGridTextColumn Header="Ср. цена" Binding="{Binding Position.AverageFilledPrice}"
-                                        Width=".5*"
-                                        ElementStyle="{StaticResource DataGridTextBlockStyle}"/>
-
-                <DataGridTextColumn Header="Открытый ПиУ" Binding="{Binding Position.CurrencyOpenPnL}"
-                                        ElementStyle="{StaticResource DataGridTextBlockStyle}"
-                                        Width=".5*"/>
-
-                <DataGridTemplateColumn Header="Открытый ордер" Width="1.5*">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <UniformGrid Rows="1">
-                                <TextBlock Text="{Binding OpenOrder.Direction}" Style="{StaticResource BaseTextBlockStyle}"/>
-                                <TextBlock Text="{Binding OpenOrder.Quantity}" Style="{StaticResource BaseTextBlockStyle}"/>
-                                <TextBlock Text="{Binding OpenOrder.LimitPrice}" Style="{StaticResource BaseTextBlockStyle}"/>
-                            </UniformGrid>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
+        <StackPanel x:Name="spContainer">
+            <Grid Height="{StaticResource StackPanelElementHeight}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="account:" Style="{StaticResource BaseTextBlockStyle}"/>
+                <TextBlock Grid.Column="1"
+                           Text="{Binding Container.Account}"
+                           TextAlignment="Center"
+                           Style="{StaticResource BaseTextBlockStyle}"/>
+            </Grid>
+            <Grid Height="{StaticResource StackPanelElementHeight}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="position:" Style="{StaticResource BaseTextBlockStyle}"/>
+                <TextBlock Grid.Column="1" 
+                           TextAlignment="Center"
+                           Text="{Binding Position.CurrentVolume}"
+                           Style="{StaticResource BaseTextBlockStyle}"/>
+            </Grid>
+            <Grid Height="{StaticResource StackPanelElementHeight}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="1.5*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="market data:" Style="{StaticResource BaseTextBlockStyle}"/>
+                <TextBlock Grid.Column="1" Text="{Binding BidPrice}"
+                           Style="{StaticResource BaseTextBlockStyle}" TextAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="{Binding AskPrice}" 
+                           Style="{StaticResource BaseTextBlockStyle}" TextAlignment="Center"/>
+            </Grid>
+        </StackPanel>
     </Grid>
 </Window>

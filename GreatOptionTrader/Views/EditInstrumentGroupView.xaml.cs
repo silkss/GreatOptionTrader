@@ -1,7 +1,6 @@
 ﻿using Connectors.IB;
-using GreatOptionTrader.Commands;
+using Core;
 using GreatOptionTrader.ViewModels;
-using System.ComponentModel;
 using System.Windows;
 
 namespace GreatOptionTrader.Views;
@@ -9,18 +8,15 @@ namespace GreatOptionTrader.Views;
 /// Логика взаимодействия для EditInstrumentGroupView.xaml
 /// </summary>
 public partial class EditInstrumentGroupView : Window {
+    private readonly OptionStrategyContainerViewModel container;
+    private readonly InteractiveBroker broker;
+
     public EditInstrumentGroupView (
-        OptionStrategyContainerViewModel vm, 
+        OptionStrategyContainerViewModel container, 
         InteractiveBroker broker) {
         InitializeComponent();
-        DataContext = vm;
-        cbAccounts.ItemsSource = broker.Accounts;
-        tbnCancelOrder.Command = new CancelOrderCommand(broker);
-        btnRequest.Command = new RequestOptionCommand(broker);
-        btnSendOrder.Command = new SendOrderCommand(broker);
-    }
-
-    protected override void OnClosing (CancelEventArgs e) {
-        base.OnClosing(e);
+        this.container = container;
+        this.broker = broker;
+        spContainer.DataContext = container;
     }
 }
