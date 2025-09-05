@@ -71,17 +71,14 @@
                         </Path>
                     </Button.Content>
                 </Button>
-                <Button Width="32" Height="32"
-                        Command="{Binding EditInstrumentGroup}"
-                        CommandParameter="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem}"
-                        Style="{StaticResource BaseButtonStyle}"
-                        ToolTip="Изменить контейнер \ добавить стратегии.">
-                    <Button.Content>
-                        <Ellipse Width="16" Height="16" 
-                                 StrokeThickness="4"
-                                 Stroke="{Binding RelativeSource={RelativeSource AncestorType=Control}, Path=Foreground}" />
-                    </Button.Content>
-                </Button>
+
+                <Button Width="32" Height="32" Content="M" Style="{StaticResource BaseButtonStyle}"
+                        FontWeight="UltraBlack"
+                        Command="{Binding OpenMasterPositionCommand}"
+                        CommandParameter="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem}"/>
+
+                <Button Width="32" Height="32" Content="H" Style="{StaticResource BaseButtonStyle}"
+                        FontWeight="UltraBlack"/>
             </StackPanel>
         </Grid>
     </DockPanel>

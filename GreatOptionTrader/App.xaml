@@ -72,8 +72,10 @@
                                 <ColumnDefinition Width="100"/>
                                 <ColumnDefinition Width="100"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="{Binding Container.Name}" FontWeight="SemiBold"/>
-                            <TextBlock Grid.Column="1" Text="{Binding Instrument.Name}"
+                            <TextBlock Grid.Column="0" Text="{Binding Container.Name}" 
+                                       FontWeight="SemiBold"/>
+                            <TextBlock Grid.Column="1" Text="{Binding Instrument.Name}" 
+                                       FontWeight="SemiBold"
                                        TextAlignment="Right"/>
                             <TextBlock Grid.Column="2" Text="{Binding Position.CurrentVolume}"
                                        TextAlignment="Right"/>

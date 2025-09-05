@@ -2,6 +2,7 @@
 using Core;
 using GreatOptionTrader.Models;
 using GreatOptionTrader.ViewModels.Base;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,8 +13,6 @@ namespace GreatOptionTrader.ViewModels;
 public class OptionStrategyContainerViewModel : BaseOptionStrategyViewModel {
     private readonly InteractiveBroker broker;
     private readonly Dispatcher dispatcher;
-    private string? requestedOptionName;
-    private string? requestedOptionExchange;
     private Task? pnlUpdaterWorker;
 
     private async Task makePnLUpdaterWorker() {
@@ -32,7 +31,7 @@ public class OptionStrategyContainerViewModel : BaseOptionStrategyViewModel {
     public OptionStrategyContainerViewModel (
         OptionStrategiesContainer container,
         InteractiveBroker broker,
-        Dispatcher dispatcher) : base(container.Orders) {
+        Dispatcher dispatcher) : base(broker, container.Orders) {
         this.dispatcher = dispatcher;
         Container = container;
         this.broker = broker;
@@ -43,27 +42,9 @@ public class OptionStrategyContainerViewModel : BaseOptionStrategyViewModel {
     public decimal CurrencyOpenPnL { get; private set; }
     public decimal CurrencyFixedPnL { get; private set; }
     public decimal CurrencyTotalPnL { get; private set; }
+    public override ICollection<Order> Orders => Container.Orders;
 
     public ObservableCollection<OptionStrategyViewModel> OptionStrategies { get; }
-
-    public string? RequestedOptionName {
-        get => requestedOptionName;
-        set {
-            if (requestedOptionName != value) {
-                requestedOptionName = value;
-                RaisePropertyChanged(nameof(RequestedOptionName));
-            }
-        }
-    }
-    public string? RequestedOptionExchange {
-        get => requestedOptionExchange;
-        set {
-            if (requestedOptionExchange != value) {
-                requestedOptionExchange = value;
-                RaisePropertyChanged(nameof(RequestedOptionExchange));
-            }
-        }
-    }
 
     public OptionStrategiesContainer Container { get; }
 
@@ -81,6 +62,7 @@ public class OptionStrategyContainerViewModel : BaseOptionStrategyViewModel {
         RaisePropertyChanged(nameof(IsStarted));
         pnlUpdaterWorker = makePnLUpdaterWorker();
     }
+    
     public void AddStrategy(OptionStrategy strategy) {
         Container.Strategies.Add(strategy);
         var vm = createOptionStrategyViewModel(strategy);
@@ -88,28 +70,19 @@ public class OptionStrategyContainerViewModel : BaseOptionStrategyViewModel {
             OptionStrategies.Add(vm);
         });
     }
+
     public void UpdatePnL () {
-        decimal currencyOpenPnl = 0m, currencyFixedPnL = 0m, currencyTotalPnL;
-
-        foreach (var ivm in OptionStrategies) {
-            currencyOpenPnl += ivm.Position.CurrencyOpenPnL;
-            currencyFixedPnL += ivm.Position.CurrencyFixedPnL;
+        decimal currencyOpenPnL = 0m;
+        if (Position.CurrentVolume > 0) {
+            currencyOpenPnL += Position.CalculateLongPnL(AskPrice, Instrument.Multiplier);
         }
-
-        if (CurrencyOpenPnL != currencyOpenPnl) {
-            CurrencyOpenPnL = currencyOpenPnl;
+        else if (Position.CurrentVolume < 0) {
+            currencyOpenPnL = Position.CalculateShortPnL(BidPrice, Instrument.Multiplier);
+        }
+        
+        if (CurrencyOpenPnL != currencyOpenPnL) {
+            CurrencyOpenPnL = currencyOpenPnL;
             RaisePropertyChanged(nameof(CurrencyOpenPnL));
-        }
-
-        if (CurrencyFixedPnL != currencyFixedPnL) {
-            CurrencyFixedPnL = currencyFixedPnL;
-            RaisePropertyChanged(nameof(CurrencyFixedPnL));
-        }
-
-        currencyTotalPnL = CurrencyOpenPnL + CurrencyFixedPnL;
-        if (CurrencyTotalPnL != currencyTotalPnL) {
-            CurrencyTotalPnL = currencyTotalPnL;
-            RaisePropertyChanged(nameof(CurrencyTotalPnL));
         }
     }
 }

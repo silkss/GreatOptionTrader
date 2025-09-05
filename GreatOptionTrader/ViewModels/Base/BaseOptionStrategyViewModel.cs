@@ -1,5 +1,7 @@
 ﻿using Connectors;
+using Connectors.IB;
 using Core;
+using System;
 using System.Collections.Generic;
 
 namespace GreatOptionTrader.ViewModels.Base;
@@ -14,13 +16,17 @@ public abstract class BaseOptionStrategyViewModel : ObservableMarketDataObserver
         return openOrder;
     }
 
-    protected BaseOptionStrategyViewModel (IEnumerable<Order> orders) {
+    protected BaseOptionStrategyViewModel (InteractiveBroker broker, IEnumerable<Order> orders) {
         Position = new PositionViewModel(orders);
         OpenOrder = checkIfHaveOpenOrder(orders);
+        SubscribeOwnEvents(broker);
     }
+    
+    
 
     public PositionViewModel Position { get; }
     public Order? OpenOrder { get; set; }
+    public abstract ICollection<Order> Orders { get; }
 
     public void OnCompletedOrderUpdated (int permId, CompletedOrderEventArgument arg) {
         if (OpenOrder == null) return;
@@ -62,5 +68,28 @@ public abstract class BaseOptionStrategyViewModel : ObservableMarketDataObserver
 
         OpenOrder.PermId = args.PermId;
         OpenOrder.Commission = args.Commission;
+    }
+    
+    public void SubscribeOwnEvents (InteractiveBroker broker) {
+        broker.OrderStatusUpdated += UpdateOrderStatus;
+        broker.CommissionUpdated += UpdateOrderCommission;
+        broker.CompletedOrderUpdated += OnCompletedOrderUpdated;
+    }
+
+    public Order MakeOrder (InteractiveBroker broker, string account, OrderParamsViewModel orderParams) {
+        if (OpenOrder != null) {
+            throw new Exception("order already exist");
+        }
+
+        OpenOrder = new Order() {
+            Account = account,
+            BrokerId = broker.GetValidOrderId(),
+            CreatedTime = DateTime.Now,
+            Direction = orderParams.Direction,
+            LimitPrice = orderParams.Price,
+            Quantity = orderParams.Volume,
+        };
+        Orders.Add(OpenOrder);
+        return OpenOrder;
     }
 }
