@@ -20,13 +20,14 @@ public partial class CreateStrategyContainerView : Window, INotifyPropertyChange
 
     public Option? SelectedOption { get; set; }
     public string? SelectedAccount { get; set; }
+    public ContainerSettings Settings { get; }
 
     public CreateStrategyContainerView (InteractiveBroker broker, OptionStrategiesContainersRepository repository) {
         InitializeComponent();
+        this.Settings = new ContainerSettings() { CurrencyTargetPnL = 1000m };
         this.broker = broker;
         this.repository = repository;
         this.cbAccounts.ItemsSource = broker.Accounts;
-
 
         cbAccounts.SetBinding(
             ComboBox.SelectedItemProperty,
@@ -36,12 +37,22 @@ public partial class CreateStrategyContainerView : Window, INotifyPropertyChange
                 Mode = BindingMode.OneWayToSource,
                 UpdateSourceTrigger = UpdateSourceTrigger.Explicit
             });
+
         labSelectedOption.SetBinding(
             Label.ContentProperty,
             new Binding() {
                 Source = this,
                 Path = new PropertyPath(nameof(SelectedOption)),
                 Mode = BindingMode.OneWay,
+            });
+
+        tbTargetPnL.SetBinding(
+            TextBox.TextProperty,
+            new Binding() {
+                Source = this,
+                Path = new PropertyPath(nameof(Settings.CurrencyTargetPnL)),
+                Mode = BindingMode.OneWayToSource,
+                UpdateSourceTrigger = UpdateSourceTrigger.LostFocus
             });
     }
 
@@ -82,8 +93,9 @@ public partial class CreateStrategyContainerView : Window, INotifyPropertyChange
             Strategies = [],
             Instrument = SelectedOption,
             Orders = [],
-            Account = SelectedAccount
-        };
+            Account = SelectedAccount,
+            Settings = Settings
+        }; 
 
         repository.Create(container);
         DialogResult = true;

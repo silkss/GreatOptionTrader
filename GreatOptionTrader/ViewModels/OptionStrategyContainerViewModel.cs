@@ -35,13 +35,13 @@ public class OptionStrategyContainerViewModel : BaseOptionStrategyViewModel {
         this.dispatcher = dispatcher;
         Container = container;
         this.broker = broker;
-        this.OptionStrategies = new ObservableCollection<OptionStrategyViewModel>(container.Strategies.Select(createOptionStrategyViewModel));
+        OptionStrategies = new ObservableCollection<OptionStrategyViewModel>(container.Strategies.Select(createOptionStrategyViewModel));
     }
 
     public bool IsStarted { get; set; }
-    public decimal CurrencyOpenPnL { get; private set; }
     public decimal CurrencyFixedPnL { get; private set; }
     public decimal CurrencyTotalPnL { get; private set; }
+    public ContainerSettings ContainerSettings => Container.Settings;
     public override ICollection<Order> Orders => Container.Orders;
 
     public ObservableCollection<OptionStrategyViewModel> OptionStrategies { get; }
@@ -51,12 +51,9 @@ public class OptionStrategyContainerViewModel : BaseOptionStrategyViewModel {
     public override Option Instrument => Container.Instrument;
 
     public void Start (InteractiveBroker broker) {
-        if (IsStarted) { return; }
-        broker.SubscribeOnMarketData(this);
+        if (IsStarted) return;         broker.SubscribeOnMarketData(this);
 
-        foreach (var optionStrategy in OptionStrategies) {
-            broker.SubscribeOnMarketData(optionStrategy);
-        }
+        foreach (var optionStrategy in OptionStrategies)             broker.SubscribeOnMarketData(optionStrategy);
 
         IsStarted = true;
         RaisePropertyChanged(nameof(IsStarted));
@@ -66,23 +63,37 @@ public class OptionStrategyContainerViewModel : BaseOptionStrategyViewModel {
     public void AddStrategy(OptionStrategy strategy) {
         Container.Strategies.Add(strategy);
         var vm = createOptionStrategyViewModel(strategy);
+        
+        if (IsStarted)             broker.SubscribeOnMarketData(vm);
+        
         dispatcher.Invoke(() => {
             OptionStrategies.Add(vm);
         });
     }
 
-    public void UpdatePnL () {
-        decimal currencyOpenPnL = 0m;
-        if (Position.CurrentVolume > 0) {
-            currencyOpenPnL += Position.CalculateLongPnL(AskPrice, Instrument.Multiplier);
+    public override void UpdatePnL () {
+        base.UpdatePnL();
+        decimal hedgeOpenPnL = 0m;
+        decimal totalPnL = 0m;
+
+        foreach (var strategy in OptionStrategies) {
+            strategy.UpdatePnL();
+            hedgeOpenPnL += strategy.CurrencyOpenPnL;
         }
-        else if (Position.CurrentVolume < 0) {
-            currencyOpenPnL = Position.CalculateShortPnL(BidPrice, Instrument.Multiplier);
+
+        totalPnL = CurrencyOpenPnL + hedgeOpenPnL;
+
+        if (CurrencyTotalPnL != totalPnL) {
+            CurrencyTotalPnL = totalPnL;
+            RaisePropertyChanged(nameof(CurrencyTotalPnL));
         }
-        
-        if (CurrencyOpenPnL != currencyOpenPnL) {
-            CurrencyOpenPnL = currencyOpenPnL;
-            RaisePropertyChanged(nameof(CurrencyOpenPnL));
+    }
+    
+    public void Close(InteractiveBroker broker) {
+        Close(broker, Container.Account);
+
+        foreach (var strategy in OptionStrategies) {
+            strategy.Close(broker, Container.Account);
         }
     }
 }

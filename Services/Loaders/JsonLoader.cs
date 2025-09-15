@@ -12,12 +12,12 @@ public abstract class JsonLoader<TItem>(string folder) : ILoader<TItem> {
     protected abstract string buildName (TItem item);
 
     public IEnumerable<TItem> LoadAll() {
-        if (!Directory.Exists(folder))             Directory.CreateDirectory(folder);
+        if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
 
         foreach (var path in Directory.GetFiles(folder, "*.json")) {
             var content = File.ReadAllText(path);
             var item = JsonSerializer.Deserialize<TItem>(content);
-            if (item != null)                 yield return item;
+            if (item != null) yield return item;
         }
         yield break;
     }

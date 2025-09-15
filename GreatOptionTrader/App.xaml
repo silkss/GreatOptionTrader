@@ -36,6 +36,7 @@
                         <ColumnDefinition Width="100"/>
                         <ColumnDefinition Width="100"/>
                         <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="100"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="1" Text="{Binding Instrument.Name}" FontWeight="SemiBold"/>
                     
@@ -46,8 +47,8 @@
                     
                     <TextBlock Grid.Column="3" Text="{Binding Position.CurrentVolume}" TextAlignment="Right"/>
                     <TextBlock Grid.Column="4" Text="{Binding Position.AverageFilledPrice}" TextAlignment="Right"/>
-                    <TextBlock Grid.Column="5" Text="{Binding Position.CurrencyOpenPnL}"
-                               Background="{Binding Position.CurrencyOpenPnL, Converter={StaticResource PnLToBrushConv}}"
+                    <TextBlock Grid.Column="5" Text="{Binding CurrencyOpenPnL, StringFormat=0.00$}"
+                               Background="{Binding CurrencyOpenPnL, Converter={StaticResource PnLToBrushConv}}"
                                FontWeight="SemiBold"
                                TextAlignment="Right"/>
                     
@@ -71,6 +72,7 @@
                                 <ColumnDefinition Width="100"/>
                                 <ColumnDefinition Width="100"/>
                                 <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="100"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="{Binding Container.Name}" 
                                        FontWeight="SemiBold"/>
@@ -81,12 +83,15 @@
                                        TextAlignment="Right"/>
                             <TextBlock Grid.Column="3" Text="{Binding Position.AverageFilledPrice}"
                                        TextAlignment="Right"/>
-                            <TextBlock Grid.Column="4" Text="{Binding CurrencyOpenPnL}"
+                            <TextBlock Grid.Column="4" Text="{Binding CurrencyOpenPnL, StringFormat=0.00$}"
                                        Background="{Binding CurrencyOpenPnL, Converter={StaticResource PnLToBrushConv}}"
                                        TextAlignment="Right"
                                        FontWeight="SemiBold"/>
-                            <TextBlock Grid.Column="5" Text="{Binding CurrencyTotalPnL}"
+                            <TextBlock Grid.Column="5" Text="{Binding CurrencyTotalPnL, StringFormat=0.00$}"
                                        Background="{Binding CurrencyTotalPnL, Converter={StaticResource PnLToBrushConv}}"
+                                       TextAlignment="Right"
+                                       FontWeight="SemiBold"/>
+                            <TextBlock Grid.Column="6" Text="{Binding ContainerSettings.CurrencyTargetPnL}"
                                        TextAlignment="Right"
                                        FontWeight="SemiBold"/>
                         </Grid>

@@ -57,6 +57,17 @@
                         Click="requestclicked"
                         Style="{StaticResource BaseButtonStyle}" Content="+"/>
             </Grid>
+
+            <Grid Height="{StaticResource StackPanelElementHeight}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="target PnL:" 
+                           Style="{StaticResource BaseTextBlockStyle}"/>
+                <TextBox x:Name="tbTargetPnL" Grid.Column="1"
+                         Style="{StaticResource BaseTextBoxStyle}"/>
+            </Grid>
         </StackPanel>
 
         <Button

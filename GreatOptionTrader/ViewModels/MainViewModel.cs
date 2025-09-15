@@ -19,6 +19,8 @@ public class MainViewModel {
         AddOptionStrategyCommand = new AddOptionStrategyCommand(broker);
         StartAllContainers = new StartAllContainerCommand(broker, optionStrategiesContainersRepository.ContainerViewModels);
         OpenMasterPositionCommand = new OpenMasterPositionCommand(broker);
+        CloseContainerCommand = new CloseContainerCommand(broker);
+        EditHedgeCommand = new EditHedgeCommand(broker);
     }
 
     public ConnectCommand Connect { get; } 
@@ -27,5 +29,7 @@ public class MainViewModel {
     public AddOptionStrategyCommand AddOptionStrategyCommand { get; }
     public CreateGroupCommand CreateGroup { get; }
     public OpenMasterPositionCommand OpenMasterPositionCommand { get; }
+    public CloseContainerCommand CloseContainerCommand { get; }
+    public EditHedgeCommand EditHedgeCommand { get; }
     public ObservableCollection<OptionStrategyContainerViewModel> Containers => optionStrategiesContainersRepository.ContainerViewModels;
 }

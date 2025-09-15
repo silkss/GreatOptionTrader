@@ -8,4 +8,5 @@ public class OptionStrategiesContainer : OptionStrategy {
     public required string Name { get; set; }
     public required List<OptionStrategy> Strategies { get; init; }
     public required string Account { get; init; }
+    public required ContainerSettings Settings { get; init; }
 }

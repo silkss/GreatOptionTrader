@@ -2,6 +2,9 @@
 using GreatOptionTrader.ViewModels;
 using System;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Media.TextFormatting;
 
 namespace GreatOptionTrader.Views;
 /// <summary>
@@ -23,6 +26,14 @@ public partial class OpenMasterPositionVIew : Window {
             Volume = 1,
             Direction = Core.TradeDirection.Buy,
         };
+        tbTargetPnL.SetBinding(
+            TextBox.TextProperty,
+            new Binding() {
+                Source = container.ContainerSettings,
+                Path = new PropertyPath(nameof(container.ContainerSettings.CurrencyTargetPnL)),
+                Mode = BindingMode.TwoWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.LostFocus
+            });
 
         ugOrderParams.DataContext = OrderParams;
     }
@@ -30,8 +41,7 @@ public partial class OpenMasterPositionVIew : Window {
     private void sendMasterOrder (object sender, RoutedEventArgs e) {
         if (OrderParams.Price == 0m) return;
         try {
-            var order = container.MakeOrder(broker, container.Container.Account, OrderParams);
-            broker.PlaceOrder(container.Instrument, order);
+            container.MakeAndPlaceOrder(broker, container.Container.Account, OrderParams);
         }
         catch (Exception exception) {
             MessageBox.Show(exception.Message, "ERROR", MessageBoxButton.OK, MessageBoxImage.Error);

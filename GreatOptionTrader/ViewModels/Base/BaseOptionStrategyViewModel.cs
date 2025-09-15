@@ -15,18 +15,17 @@ public abstract class BaseOptionStrategyViewModel : ObservableMarketDataObserver
         }
         return openOrder;
     }
-
+    
     protected BaseOptionStrategyViewModel (InteractiveBroker broker, IEnumerable<Order> orders) {
         Position = new PositionViewModel(orders);
         OpenOrder = checkIfHaveOpenOrder(orders);
         SubscribeOwnEvents(broker);
     }
-    
-    
 
     public PositionViewModel Position { get; }
     public Order? OpenOrder { get; set; }
     public abstract ICollection<Order> Orders { get; }
+    public decimal CurrencyOpenPnL { get; set; }
 
     public void OnCompletedOrderUpdated (int permId, CompletedOrderEventArgument arg) {
         if (OpenOrder == null) return;
@@ -76,7 +75,7 @@ public abstract class BaseOptionStrategyViewModel : ObservableMarketDataObserver
         broker.CompletedOrderUpdated += OnCompletedOrderUpdated;
     }
 
-    public Order MakeOrder (InteractiveBroker broker, string account, OrderParamsViewModel orderParams) {
+    public void MakeAndPlaceOrder (InteractiveBroker broker, string account, OrderParamsViewModel orderParams) {
         if (OpenOrder != null) {
             throw new Exception("order already exist");
         }
@@ -89,7 +88,57 @@ public abstract class BaseOptionStrategyViewModel : ObservableMarketDataObserver
             LimitPrice = orderParams.Price,
             Quantity = orderParams.Volume,
         };
+
         Orders.Add(OpenOrder);
-        return OpenOrder;
+
+        broker.PlaceOrder(Instrument, OpenOrder);
+    }
+
+    public virtual void Close(InteractiveBroker broker, string account) {
+        if (OpenOrder != null) {
+            broker.CancelOrder(OpenOrder.Id);
+            return;
+        }
+
+        if (Position.CurrentVolume > 0m) {
+            OpenOrder = new Order() {
+                Account = account,
+                BrokerId = broker.GetValidOrderId(),
+                CreatedTime = DateTime.Now,
+                Direction = TradeDirection.Sell,
+                LimitPrice = BidPrice,
+                Quantity = Math.Abs(Position.CurrentVolume)
+            };
+        }
+        else if (Position.CurrentVolume < 0m) {
+            OpenOrder = new Order() {
+                Account = account,
+                BrokerId = broker.GetValidOrderId(),
+                CreatedTime = DateTime.Now,
+                Direction = TradeDirection.Buy,
+                LimitPrice = AskPrice,
+                Quantity = Math.Abs(Position.CurrentVolume)
+            };
+        }
+
+        if (OpenOrder != null) {
+            Orders.Add(OpenOrder);
+            broker.PlaceOrder(Instrument, OpenOrder);
+        }
+    }
+
+    public virtual void UpdatePnL () {
+        decimal currencyOpenPnL = 0m;
+        if (Position.CurrentVolume > 0) {
+            currencyOpenPnL += Position.CalculateLongPnL(BidPrice, Instrument.Multiplier);
+        }
+        else if (Position.CurrentVolume < 0) {
+            currencyOpenPnL = Position.CalculateShortPnL(AskPrice, Instrument.Multiplier);
+        }
+
+        if (CurrencyOpenPnL != currencyOpenPnL) {
+            CurrencyOpenPnL = currencyOpenPnL;
+            RaisePropertyChanged(nameof(CurrencyOpenPnL));
+        }
     }
 }
