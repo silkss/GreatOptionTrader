@@ -52,8 +52,9 @@
                                FontWeight="SemiBold"
                                TextAlignment="Right"/>
                     
-                    <TextBlock Grid.Column="6" Text="{Binding Position.CurrencyFixedPnL}"
-                            Background="{Binding Position.CurrencyFixedPnL, Converter={StaticResource PnLToBrushConv}}"
+                    <TextBlock Grid.Column="6" Text="{Binding CurrencyTotalPnL, StringFormat=0.00$}"
+                            Background="{Binding CurrencyTotalPnL, Converter={StaticResource PnLToBrushConv}}"
+                               FontWeight="SemiBold"
                             TextAlignment="Right"/>
                 </Grid>
             </DataTemplate>

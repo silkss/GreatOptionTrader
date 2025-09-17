@@ -6,10 +6,8 @@ using System.Collections.Generic;
 namespace GreatOptionTrader.ViewModels;
 public class PositionViewModel : ObservableObject {
     public static decimal CalculatePnL (decimal buyPrice, decimal sellPrice) => sellPrice - buyPrice;
+
     private decimal previousOpeningPrice;
-    private decimal openPnL;
-    private decimal currencyOpenPnL;
-    private decimal currencyFixedPnL;
 
     public decimal CurrentVolume { get; private set; }
     public decimal AbsoluteCurrentVolume => Math.Abs(CurrentVolume);
@@ -20,17 +18,6 @@ public class PositionViewModel : ObservableObject {
     public decimal AverageFilledPrice { get; private set; }
     public decimal CommissionCurrency { get; private set; }
     public decimal FixedPnL { get; private set; }
-    public decimal CurrencyFixedPnL { get => currencyFixedPnL; set => Set(ref currencyFixedPnL, value); }
-    public decimal OpenPnL { 
-        get => openPnL;
-        set => Set(ref openPnL, value);
-    }
-    public decimal CurrencyOpenPnL {
-        get => currencyOpenPnL;
-        set => Set(ref currencyOpenPnL, value);
-    }
-
-    public decimal GetFixedCurrencyPnL (int multiplier) => FixedPnL * multiplier - CommissionCurrency;
 
     public PositionViewModel (IEnumerable<Order> orders) {
         foreach (var order in orders) ProcessOrder(order);
@@ -112,15 +99,5 @@ public class PositionViewModel : ObservableObject {
                 RaisePropertyChanged(nameof(CurrentVolume));
             }
         }
-    }
-
-    public void UpdateFixedPnL (int multiplier) => CurrencyFixedPnL = FixedPnL * multiplier;
-
-    public decimal CalculateShortPnL(decimal buyPrice, int multiplier) {
-        return CalculatePnL(buyPrice, AverageFilledPrice) * AbsoluteCurrentVolume * multiplier;
-    }
-
-    public decimal CalculateLongPnL(decimal sellPrice, int multiplier) {
-        return CalculatePnL(AverageFilledPrice, sellPrice) * CurrentVolume * multiplier;
     }
 }

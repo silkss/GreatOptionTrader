@@ -5,18 +5,25 @@ using System;
 using System.Collections.Generic;
 
 namespace GreatOptionTrader.ViewModels.Base;
-public abstract class BaseOptionStrategyViewModel : ObservableMarketDataObserver<Option> {
-    private static Order? checkIfHaveOpenOrder (IEnumerable<Order> orders) {
+public abstract class BaseOptionStrategyViewModel : ObservableMarketDataObserver<Option>
+{
+    private static decimal calculatePnL(decimal sellPrice, decimal buyPrice) => sellPrice - buyPrice;
+
+    private static Order? checkIfHaveOpenOrder(IEnumerable<Order> orders)
+    {
         Order? openOrder = null;
-        foreach (var order in orders) {
-            if (order.Status == OrderStatus.Submitted) {
+        foreach (var order in orders)
+        {
+            if (order.Status == OrderStatus.Submitted)
+            {
                 openOrder = order;
             }
         }
         return openOrder;
     }
-    
-    protected BaseOptionStrategyViewModel (InteractiveBroker broker, IEnumerable<Order> orders) {
+
+    protected BaseOptionStrategyViewModel(InteractiveBroker broker, IEnumerable<Order> orders)
+    {
         Position = new PositionViewModel(orders);
         OpenOrder = checkIfHaveOpenOrder(orders);
         SubscribeOwnEvents(broker);
@@ -25,16 +32,20 @@ public abstract class BaseOptionStrategyViewModel : ObservableMarketDataObserver
     public PositionViewModel Position { get; }
     public Order? OpenOrder { get; set; }
     public abstract ICollection<Order> Orders { get; }
+
+    public decimal CurrencyTotalPnL { get; set; }
     public decimal CurrencyOpenPnL { get; set; }
 
-    public void OnCompletedOrderUpdated (int permId, CompletedOrderEventArgument arg) {
+    public void OnCompletedOrderUpdated(int permId, CompletedOrderEventArgument arg)
+    {
         if (OpenOrder == null) return;
         if (OpenOrder.PermId != permId) return;
 
         OpenOrder.FilledVolume = arg.FilledVolume;
         OpenOrder.Status = arg.Status;
 
-        if (OpenOrder.AverageFilledPrice == 0m) {
+        if (OpenOrder.AverageFilledPrice == 0m)
+        {
             OpenOrder.AverageFilledPrice = OpenOrder.LimitPrice;
         }
 
@@ -42,7 +53,8 @@ public abstract class BaseOptionStrategyViewModel : ObservableMarketDataObserver
         OpenOrder = null;
     }
 
-    public void UpdateOrderStatus (int id, OrderStatusEventArgument arg) {
+    public void UpdateOrderStatus(int id, OrderStatusEventArgument arg)
+    {
         if (OpenOrder == null) return;
         if (OpenOrder.BrokerId != id) return;
 
@@ -50,8 +62,10 @@ public abstract class BaseOptionStrategyViewModel : ObservableMarketDataObserver
         OpenOrder.AverageFilledPrice = arg.AverageFilledPrice;
         OpenOrder.FilledVolume = arg.FilledVolume;
 
-        if (OpenOrder.Status == OrderStatus.Filled) {
-            if (OpenOrder.IsCompleted) {
+        if (OpenOrder.Status == OrderStatus.Filled)
+        {
+            if (OpenOrder.IsCompleted)
+            {
                 Position.ProcessOrder(OpenOrder);
                 OpenOrder = null;
                 return;
@@ -61,26 +75,31 @@ public abstract class BaseOptionStrategyViewModel : ObservableMarketDataObserver
         if (OpenOrder.Status == OrderStatus.Cancelled) OpenOrder = null;
     }
 
-    public void UpdateOrderCommission (int orderId, CommissionUpdateEventArgs args) {
+    public void UpdateOrderCommission(int orderId, CommissionUpdateEventArgs args)
+    {
         if (OpenOrder == null) return;
         if (OpenOrder.BrokerId != orderId) return;
 
         OpenOrder.PermId = args.PermId;
         OpenOrder.Commission = args.Commission;
     }
-    
-    public void SubscribeOwnEvents (InteractiveBroker broker) {
+
+    public void SubscribeOwnEvents(InteractiveBroker broker)
+    {
         broker.OrderStatusUpdated += UpdateOrderStatus;
         broker.CommissionUpdated += UpdateOrderCommission;
         broker.CompletedOrderUpdated += OnCompletedOrderUpdated;
     }
 
-    public void MakeAndPlaceOrder (InteractiveBroker broker, string account, OrderParamsViewModel orderParams) {
-        if (OpenOrder != null) {
+    public void MakeAndPlaceOrder(InteractiveBroker broker, string account, OrderParamsViewModel orderParams)
+    {
+        if (OpenOrder != null)
+        {
             throw new Exception("order already exist");
         }
 
-        OpenOrder = new Order() {
+        OpenOrder = new Order()
+        {
             Account = account,
             BrokerId = broker.GetValidOrderId(),
             CreatedTime = DateTime.Now,
@@ -94,14 +113,18 @@ public abstract class BaseOptionStrategyViewModel : ObservableMarketDataObserver
         broker.PlaceOrder(Instrument, OpenOrder);
     }
 
-    public virtual void Close(InteractiveBroker broker, string account) {
-        if (OpenOrder != null) {
+    public virtual void Close(InteractiveBroker broker, string account)
+    {
+        if (OpenOrder != null)
+        {
             broker.CancelOrder(OpenOrder.Id);
             return;
         }
 
-        if (Position.CurrentVolume > 0m) {
-            OpenOrder = new Order() {
+        if (Position.CurrentVolume > 0m)
+        {
+            OpenOrder = new Order()
+            {
                 Account = account,
                 BrokerId = broker.GetValidOrderId(),
                 CreatedTime = DateTime.Now,
@@ -110,8 +133,10 @@ public abstract class BaseOptionStrategyViewModel : ObservableMarketDataObserver
                 Quantity = Math.Abs(Position.CurrentVolume)
             };
         }
-        else if (Position.CurrentVolume < 0m) {
-            OpenOrder = new Order() {
+        else if (Position.CurrentVolume < 0m)
+        {
+            OpenOrder = new Order()
+            {
                 Account = account,
                 BrokerId = broker.GetValidOrderId(),
                 CreatedTime = DateTime.Now,
@@ -121,24 +146,40 @@ public abstract class BaseOptionStrategyViewModel : ObservableMarketDataObserver
             };
         }
 
-        if (OpenOrder != null) {
+        if (OpenOrder != null)
+        {
             Orders.Add(OpenOrder);
             broker.PlaceOrder(Instrument, OpenOrder);
         }
     }
 
-    public virtual void UpdatePnL () {
+    public void RaisePropertyChange()
+    {
+        RaisePropertyChanged(nameof(CurrencyTotalPnL));
+        RaisePropertyChanged(nameof(CurrencyOpenPnL));
+    }
+
+    public virtual void UpdatePnL()
+    {
         decimal currencyOpenPnL = 0m;
-        if (Position.CurrentVolume > 0) {
-            currencyOpenPnL += Position.CalculateLongPnL(BidPrice, Instrument.Multiplier);
+        decimal currencyTotalPnL = 0m;
+
+        if (Position.CurrentVolume > 0)
+        {
+            currencyOpenPnL += (calculatePnL(BidPrice, Position.AverageFilledPrice) * Instrument.Multiplier * Position.CurrentVolume);
+            currencyTotalPnL += (currencyOpenPnL + (Position.FixedPnL * Instrument.Multiplier));
         }
-        else if (Position.CurrentVolume < 0) {
-            currencyOpenPnL = Position.CalculateShortPnL(AskPrice, Instrument.Multiplier);
+        else if (Position.CurrentVolume < 0)
+        {
+            currencyOpenPnL += (calculatePnL(Position.AverageFilledPrice, AskPrice) * Instrument.Multiplier * Position.AbsoluteCurrentVolume);
+            currencyTotalPnL += (currencyOpenPnL + (Position.FixedPnL * Instrument.Multiplier));
+        }
+        else
+        {
+            currencyTotalPnL += (currencyOpenPnL + (Position.FixedPnL * Instrument.Multiplier));
         }
 
-        if (CurrencyOpenPnL != currencyOpenPnL) {
-            CurrencyOpenPnL = currencyOpenPnL;
-            RaisePropertyChanged(nameof(CurrencyOpenPnL));
-        }
+        CurrencyOpenPnL = currencyOpenPnL;
+        CurrencyTotalPnL = currencyTotalPnL;
     }
 }
