@@ -30,7 +30,8 @@ public abstract class BaseOptionStrategyViewModel : ObservableMarketDataObserver
     }
 
     public PositionViewModel Position { get; }
-    public Order? OpenOrder { get; set; }
+    private Order? openOrder;
+    public Order? OpenOrder { get => openOrder; set => Set(ref openOrder, value); }
     public abstract ICollection<Order> Orders { get; }
 
     public decimal CurrencyTotalPnL { get; set; }
@@ -72,6 +73,7 @@ public abstract class BaseOptionStrategyViewModel : ObservableMarketDataObserver
             }
             OpenOrder.IsCompleted = true;
         }
+
         if (OpenOrder.Status == OrderStatus.Cancelled) OpenOrder = null;
     }
 
@@ -117,7 +119,7 @@ public abstract class BaseOptionStrategyViewModel : ObservableMarketDataObserver
     {
         if (OpenOrder != null)
         {
-            broker.CancelOrder(OpenOrder.Id);
+            broker.CancelOrder(OpenOrder.BrokerId);
             return;
         }
 

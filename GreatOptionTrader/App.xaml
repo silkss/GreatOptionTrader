@@ -36,7 +36,7 @@
                         <ColumnDefinition Width="100"/>
                         <ColumnDefinition Width="100"/>
                         <ColumnDefinition Width="100"/>
-                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="150"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="1" Text="{Binding Instrument.Name}" FontWeight="SemiBold"/>
                     
@@ -53,9 +53,19 @@
                                TextAlignment="Right"/>
                     
                     <TextBlock Grid.Column="6" Text="{Binding CurrencyTotalPnL, StringFormat=0.00$}"
-                            Background="{Binding CurrencyTotalPnL, Converter={StaticResource PnLToBrushConv}}"
+                               Background="{Binding CurrencyTotalPnL, Converter={StaticResource PnLToBrushConv}}"
                                FontWeight="SemiBold"
-                            TextAlignment="Right"/>
+                               TextAlignment="Right"/>
+
+                    <TextBlock Grid.Column="7" Style="{StaticResource BaseTextBlockStyle}" TextAlignment="Right" >
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}{0}: {1} {2}">
+                                <Binding Path="OpenOrder.Status" />
+                                <Binding Path="OpenOrder.Direction"/>
+                                <Binding Path="OpenOrder.LimitPrice" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
                 </Grid>
             </DataTemplate>
 
@@ -73,7 +83,7 @@
                                 <ColumnDefinition Width="100"/>
                                 <ColumnDefinition Width="100"/>
                                 <ColumnDefinition Width="100"/>
-                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="150"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="{Binding Container.Name}" 
                                        FontWeight="SemiBold"/>

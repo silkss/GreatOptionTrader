@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Text.Json.Serialization;
 
 namespace Core;
 
-public class Order {
+public class Order : Base.ObservableObject{
+    private OrderStatus status;
+
     public bool IsCompleted = false;
-    public int Id { get; init; }
 
     public required TradeDirection Direction { get; init; }
     public required decimal Quantity { get; init; }
@@ -15,7 +15,7 @@ public class Order {
     public required DateTime CreatedTime { get; init; }
 
     public decimal FilledVolume { get; set; }
-    public OrderStatus Status { get; set; }
+    public OrderStatus Status { get => status; set => Set(ref status, value); }
     public decimal AverageFilledPrice { get; set; }
     public decimal Commission { get; set; }
 

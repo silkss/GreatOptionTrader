@@ -1,5 +1,5 @@
 ﻿using Core;
-using GreatOptionTrader.ViewModels.Base;
+using Core.Base;
 using System;
 using System.Collections.Generic;
 

@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace GreatOptionTrader.ViewModels.Base;
+namespace Core.Base;
 public abstract class ObservableObject : INotifyPropertyChanged {
     public event PropertyChangedEventHandler? PropertyChanged;
 
