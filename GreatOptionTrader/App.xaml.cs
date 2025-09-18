@@ -1,10 +1,10 @@
-﻿using GreatOptionTrader.ViewModels;
-using Microsoft.Extensions.Logging;
-using System.Windows;
-using GreatOptionTrader.Services.Repositories;
+﻿using System.Windows;
 using System.Collections.ObjectModel;
+using Microsoft.Extensions.Logging;
 using Connectors.IB;
+using GreatOptionTrader.ViewModels;
 using GreatOptionTrader.Services;
+using GreatOptionTrader.Services.Repositories;
 
 namespace GreatOptionTrader;
 
@@ -12,7 +12,7 @@ namespace GreatOptionTrader;
 /// Interaction logic for App.xaml
 /// </summary>
 public partial class App : Application {
-    const string FolderName = "GreatOptionTrader";
+    const string FolderName = "containers";
 
     private readonly InteractiveBroker broker;
     private readonly JsonOptionStrategiesContainerLoader loader;

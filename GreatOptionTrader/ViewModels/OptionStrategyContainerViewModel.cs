@@ -24,7 +24,6 @@ public class OptionStrategyContainerViewModel : BaseOptionStrategyViewModel {
                 if (CurrencyOpenPnL >= ContainerSettings.CurrencyTargetPnL)
                 {
                     Close(broker);
-                    Container.State = Types.ContainerState.Closing;
                 }
             }
             else if (Container.State == Types.ContainerState.Closing)
@@ -130,6 +129,7 @@ public class OptionStrategyContainerViewModel : BaseOptionStrategyViewModel {
             return;
         }
 
+        Container.State = Types.ContainerState.Closing;
         Close(broker, Container.Account);
 
         foreach (var strategy in OptionStrategies) {

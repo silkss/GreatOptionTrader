@@ -22,7 +22,7 @@
         <Grid DockPanel.Dock="Bottom">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="42" />
+                <ColumnDefinition Width="42"/>
             </Grid.ColumnDefinitions>
 
             <ListView Grid.Column="0" x:Name="dgInstrumentGroups" ItemsSource="{Binding Containers}"/>
@@ -57,23 +57,6 @@
                               Fill="{Binding RelativeSource={RelativeSource AncestorType=Control}, Path=Foreground}" 
                               StrokeThickness="2"
                               StrokeLineJoin="Round" />
-                        </Button.Content>
-                    </Button>
-
-                    <Button Width="32" Height="32"
-                        Style="{StaticResource BaseButtonStyle}"
-                        Command="{Binding AddOptionStrategyCommand}"
-                        CommandParameter="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem}">
-                        <Button.Content>
-                            <Path Stroke="{Binding RelativeSource={RelativeSource AncestorType=Control}, Path=Foreground}"
-                              StrokeThickness="4">
-                                <Path.Data>
-                                    <GeometryGroup>
-                                        <LineGeometry StartPoint="10, 1" EndPoint="10,20"/>
-                                        <LineGeometry StartPoint="1, 10" EndPoint="20, 10"/>
-                                    </GeometryGroup>
-                                </Path.Data>
-                            </Path>
                         </Button.Content>
                     </Button>
 

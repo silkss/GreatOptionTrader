@@ -49,6 +49,30 @@
         <Button Grid.Row="1" Content="send order" Style="{StaticResource BaseButtonStyle}"
                 Click="sendOrder"/>
 
-        <ListView Grid.Row="2" x:Name="lvHedges"/>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="42"/>
+            </Grid.ColumnDefinitions>
+            
+            <ListView Grid.Column="0" x:Name="lvHedges"/>
+            
+            <StackPanel Orientation="Vertical" Grid.Column="1">
+                <Button Width="32" Height="32"
+                        Style="{StaticResource BaseButtonStyle}"
+                        Click="requestNewHedge">
+                    <Button.Content>
+                        <Path Stroke="{Binding RelativeSource={RelativeSource AncestorType=Control}, Path=Foreground}" StrokeThickness="4">
+                            <Path.Data>
+                                <GeometryGroup>
+                                    <LineGeometry StartPoint="10, 1" EndPoint="10,20"/>
+                                    <LineGeometry StartPoint="1, 10" EndPoint="20, 10"/>
+                                </GeometryGroup>
+                            </Path.Data>
+                        </Path>
+                    </Button.Content>
+                </Button>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>

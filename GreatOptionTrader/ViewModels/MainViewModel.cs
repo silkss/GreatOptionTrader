@@ -16,7 +16,6 @@ public class MainViewModel {
 
         this.optionStrategiesContainersRepository = optionStrategiesContainersRepository;
         CreateGroup = new CreateGroupCommand(broker, optionStrategiesContainersRepository);
-        AddOptionStrategyCommand = new AddOptionStrategyCommand(broker);
         StartAllContainers = new StartAllContainerCommand(broker, optionStrategiesContainersRepository.ContainerViewModels);
         OpenMasterPositionCommand = new OpenMasterPositionCommand(broker);
         CloseContainerCommand = new CloseContainerCommand(broker);
@@ -26,7 +25,6 @@ public class MainViewModel {
     public ConnectCommand Connect { get; } 
     public StartOptionStrategiesContainerCommand StartContainerCommand{ get; } 
     public StartAllContainerCommand StartAllContainers { get; }
-    public AddOptionStrategyCommand AddOptionStrategyCommand { get; }
     public CreateGroupCommand CreateGroup { get; }
     public OpenMasterPositionCommand OpenMasterPositionCommand { get; }
     public CloseContainerCommand CloseContainerCommand { get; }
