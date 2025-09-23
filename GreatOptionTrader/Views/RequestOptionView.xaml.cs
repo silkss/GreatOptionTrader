@@ -2,8 +2,8 @@
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Controls;
-using Core;
 using System.ComponentModel;
+using Core.Types;
 
 namespace GreatOptionTrader.Views;
 /// <summary>
@@ -51,7 +51,7 @@ public partial class RequestOptionView : Window, INotifyPropertyChanged {
             });
     }
 
-    private void onOptionRequestEvent (int id, Core.Option item) {
+    private void onOptionRequestEvent (int id, Option item) {
         if (id != requestId) {
             return;
         }

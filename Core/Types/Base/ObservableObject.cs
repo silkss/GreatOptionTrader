@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Core.Base;
+namespace Core.Types.Base;
 public abstract class ObservableObject : INotifyPropertyChanged {
     public event PropertyChangedEventHandler? PropertyChanged;
 

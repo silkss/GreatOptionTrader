@@ -3,8 +3,8 @@ using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Threading;
 using System.Collections.Generic;
-using Core.Base;
-using Core;
+using Core.Types;
+using Core.Types.Base;
 
 namespace Connectors.IB;
 
@@ -13,7 +13,7 @@ public class InteractiveBroker {
     private readonly EReaderMonitorSignal monitor;
     private readonly EClientSocket socket;
 
-    private readonly Dictionary<int, List<Core.PriceIncrement>> marketRules;
+    private readonly Dictionary<int, List<Core.Types.PriceIncrement>> marketRules;
 
     public InteractiveBroker(ILogger<InteractiveBroker> logger) { 
         marketRules = [];
@@ -26,6 +26,11 @@ public class InteractiveBroker {
     public event ItemUpdatedEvent<Option> OptionRequestedEvent {
         add => wrapper.OptionRequestedEvent += value;
         remove => wrapper.OptionRequestedEvent -= value;
+    }
+
+    public event ItemUpdatedEvent<Future> FutureReqeustedEvent {
+        add => wrapper.FutureReqeustedEvent += value;
+        remove => wrapper.FutureReqeustedEvent -= value;
     }
 
     public event ItemUpdatedEvent<OrderStatusEventArgument> OrderStatusUpdated {
@@ -69,6 +74,16 @@ public class InteractiveBroker {
         }
     }
 
+    public void RequestFuture(int requestId, string futureName, string futureExchange) {
+        var future = new Contract() {
+            LocalSymbol = futureName.Trim().ToUpper(),
+            Exchange = futureExchange.Trim().ToUpper(),
+            SecType = "FUT"
+        };
+
+        socket.reqContractDetails(requestId, contract: future);
+    }
+
     public void RequestOption(int requestId, string optionName, string otpionExchange) {
         var contract = new Contract() {
             LocalSymbol = optionName.Trim().ToUpper(),
@@ -96,7 +111,7 @@ public class InteractiveBroker {
 
     public int GetValidOrderId () => wrapper.ValidOrderId++;
 
-    public void PlaceOrder(Instrument instrument, Core.Order order) {
+    public void PlaceOrder(Instrument instrument, Core.Types.Order order) {
         var price = order.LimitPrice;
 
         decimal increment = 0m;

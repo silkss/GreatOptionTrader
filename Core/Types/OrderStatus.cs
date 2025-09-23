@@ -1,4 +1,4 @@
-﻿namespace Core;
+﻿namespace Core.Types;
 
 public enum OrderStatus {
     PendingSubmit,

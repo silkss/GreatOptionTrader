@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
-namespace Core.Base;
+namespace Core.Types.Base;
 public abstract class Instrument {
     public required int Id { get; init; }
     public required string Name { get; init; }
@@ -11,4 +12,7 @@ public abstract class Instrument {
     public required int Multiplier { get; init; }
     public required int PriceMagnifier { get; init; }
     public required List<int> MarketRulesId { get; init; }
+
+    [JsonIgnore]
+    public int DaysToExpiration => (ExpirationDate - DateTime.Now).Days;
 }

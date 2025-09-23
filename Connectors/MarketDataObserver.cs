@@ -1,14 +1,14 @@
-﻿using Core.Base;
+﻿using Core.Types.Base;
 using System;
 
 namespace Connectors;
 
-public abstract class MarketDataObserver<TInstrument> : IObserver<TickEventArg> 
+public abstract class MarketDataObserver<TInstrument> : ObservableObject, IObserver<TickEventArg>
     where TInstrument : Instrument {
 
     public abstract TInstrument Instrument { get; }
 
-    public void OnCompleted () {
+    public void OnCompleted () { 
         throw new NotImplementedException();
     }
 

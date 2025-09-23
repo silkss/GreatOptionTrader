@@ -1,9 +1,10 @@
 ﻿using Connectors.IB;
+using Core.Commands.Base;
 using GreatOptionTrader.ViewModels;
 using GreatOptionTrader.Views;
 
 namespace GreatOptionTrader.Commands;
-public class EditHedgeCommand(InteractiveBroker broker) : Base.Command {
+public class EditHedgeCommand(InteractiveBroker broker) : Command {
 
     public override bool CanExecute (object? parameter) => broker.IsConnected()
         && parameter is OptionStrategyContainerViewModel;

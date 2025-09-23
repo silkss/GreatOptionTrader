@@ -12,9 +12,6 @@
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.7" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.7" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.7" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<ProjectReference Include="..\client\CSharpAPI.csproj" />
 		<ProjectReference Include="..\Connectors\Connectors.csproj" />
 		<ProjectReference Include="..\Core\Core.csproj" />

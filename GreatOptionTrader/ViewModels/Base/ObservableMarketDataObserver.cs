@@ -1,25 +1,13 @@
 ﻿using Connectors;
-using Core;
-using Core.Base;
+using Core.Types;
+using Core.Types.Base;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace GreatOptionTrader.ViewModels.Base;
-public abstract class ObservableMarketDataObserver<TInstrument> : MarketDataObserver<TInstrument>, INotifyPropertyChanged
+public abstract class ObservableMarketDataObserver<TInstrument> : MarketDataObserver<TInstrument>
     where TInstrument : Instrument {
-    public event PropertyChangedEventHandler? PropertyChanged;
-    protected void RaisePropertyChanged(string propertyName) => PropertyChanged?
-        .Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    protected virtual bool Set<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
-    {
-        ArgumentNullException.ThrowIfNull(propertyName);
-        if (Equals(field, value)) return false;
-        field = value;
-        RaisePropertyChanged(propertyName);
-        return true;
-    }
 
     public decimal BidPrice { get; private set; }
     public decimal AskPrice { get; private set; }

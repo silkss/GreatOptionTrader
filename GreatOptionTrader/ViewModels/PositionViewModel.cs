@@ -1,5 +1,5 @@
-﻿using Core;
-using Core.Base;
+﻿using Core.Types;
+using Core.Types.Base;
 using System;
 using System.Collections.Generic;
 

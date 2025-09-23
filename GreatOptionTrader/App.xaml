@@ -5,20 +5,19 @@
              xmlns:vm="clr-namespace:GreatOptionTrader.ViewModels"
              xmlns:models="clr-namespace:GreatOptionTrader.Models"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
-             xmlns:enums="clr-namespace:Core;assembly=Core"
-             xmlns:core="clr-namespace:Core;assembly=Core">
+             xmlns:coreTypes="clr-namespace:Core.Types;assembly=Core">
 
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Core;component/Resources/BaseStyleProperties.xaml"/>
                 <ResourceDictionary Source="ConvertersDictionary.xaml" />
-                <ResourceDictionary Source="BaseStyleValues.xaml" />
                 <ResourceDictionary Source="StreatchedExpanderStyle.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <ObjectDataProvider x:Key="TradeDirectionToItemSource" MethodName="GetValues" ObjectType="{x:Type system:Enum}">
                 <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="enums:TradeDirection"/>
+                    <x:Type TypeName="coreTypes:TradeDirection"/>
                 </ObjectDataProvider.MethodParameters>
             </ObjectDataProvider>
 
@@ -120,7 +119,7 @@
                 </Expander>
             </DataTemplate>
 
-            <DataTemplate DataType="{x:Type core:Option}">
+            <DataTemplate DataType="{x:Type coreTypes:Option}">
                 <UniformGrid Rows="1">
                     <TextBlock Text="{Binding Name}"/>
                     <TextBlock Text="{Binding Exchange}"/>

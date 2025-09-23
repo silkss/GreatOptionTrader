@@ -1,8 +1,9 @@
 ﻿using Connectors.IB;
+using Core.Commands.Base;
 using GreatOptionTrader.ViewModels;
 
 namespace GreatOptionTrader.Commands;
-public class CloseContainerCommand (InteractiveBroker broker) : Base.Command {
+public class CloseContainerCommand (InteractiveBroker broker) : Command {
     public override bool CanExecute (object? parameter) => broker.IsConnected()
         && parameter is OptionStrategyContainerViewModel container
         && container.IsStarted;

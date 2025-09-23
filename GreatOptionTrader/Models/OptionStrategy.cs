@@ -1,4 +1,4 @@
-﻿using Core;
+﻿using Core.Types;
 using System.Collections.Generic;
 
 namespace GreatOptionTrader.Models;

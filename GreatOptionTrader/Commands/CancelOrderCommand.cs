@@ -1,8 +1,9 @@
 ﻿using Connectors.IB;
+using Core.Commands.Base;
 using GreatOptionTrader.ViewModels;
 
 namespace GreatOptionTrader.Commands;
-public class CancelOrderCommand (InteractiveBroker broker) : Base.Command {
+public class CancelOrderCommand (InteractiveBroker broker) : Command {
     public override bool CanExecute (object? parameter) => broker.IsConnected()
         && parameter is OptionStrategyViewModel ivm
         && ivm.OpenOrder != null;

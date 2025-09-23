@@ -1,8 +1,9 @@
 ﻿using Connectors.IB;
+using Core.Commands.Base;
 using GreatOptionTrader.ViewModels;
 
 namespace GreatOptionTrader.Commands;
-public class StartOptionStrategiesContainerCommand (InteractiveBroker broker) : Base.Command {
+public class StartOptionStrategiesContainerCommand (InteractiveBroker broker) : Command {
     public override bool CanExecute (object? parameter) => broker.IsConnected()
         && parameter is OptionStrategyContainerViewModel container
         && container.CanStarted();

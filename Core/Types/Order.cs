@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Core;
+namespace Core.Types;
 
 public class Order : Base.ObservableObject{
     private OrderStatus status;

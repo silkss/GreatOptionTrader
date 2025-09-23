@@ -1,6 +1,6 @@
 ﻿using Connectors;
 using Connectors.IB;
-using Core;
+using Core.Types;
 using System;
 using System.Collections.Generic;
 

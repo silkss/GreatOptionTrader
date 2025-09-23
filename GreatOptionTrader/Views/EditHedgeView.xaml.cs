@@ -1,4 +1,5 @@
 ﻿using Connectors.IB;
+using Core.Types;
 using GreatOptionTrader.Models;
 using GreatOptionTrader.ViewModels;
 using System;
@@ -20,7 +21,7 @@ public partial class EditHedgeView : Window {
         OrderParams = new OrderParamsViewModel() {
             Price = container.LastPrice,
             Volume = 1,
-            Direction = Core.TradeDirection.Buy,
+            Direction = TradeDirection.Buy,
         };
 
         ugOrderParams.DataContext = OrderParams;

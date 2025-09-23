@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace GreatOptionTrader.Commands.Base;
+namespace Core.Commands.Base;
 public abstract class Command : ICommand {
     public event EventHandler? CanExecuteChanged {
         add => CommandManager.RequerySuggested += value;

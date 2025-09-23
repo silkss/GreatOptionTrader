@@ -1,14 +1,14 @@
-﻿using Core;
-using IBApi;
+﻿using IBApi;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using Core.Types;
 
 namespace Connectors.IB;
 
 internal class IbWrapper (
-        Dictionary<int, List<Core.PriceIncrement>> marketRules,
+        Dictionary<int, List<Core.Types.PriceIncrement>> marketRules,
         ILogger<InteractiveBroker> logger) : DefaultEWrapper  {
 
     public int ValidOrderId;
@@ -16,6 +16,7 @@ internal class IbWrapper (
     public readonly Dictionary<int, List<IObserver<TickEventArg>>> tickObservers = [];
 
     public event ItemUpdatedEvent<Option> OptionRequestedEvent = delegate { };
+    public event ItemUpdatedEvent<Future> FutureReqeustedEvent = delegate { };
     public event ItemUpdatedEvent<OrderStatusEventArgument> OrderStatusUpdated = delegate { };
     public event ItemUpdatedEvent<CommissionUpdateEventArgs> CommissionUpdated = delegate { };
     public event ItemUpdatedEvent<CompletedOrderEventArgument> CompletedOrderUpdated = delegate { };
@@ -42,13 +43,16 @@ internal class IbWrapper (
         if (contractDetails.Contract.SecType == "FOP") {
             OptionRequestedEvent(reqId, contractDetails.ToOption());
         }
+        else if (contractDetails.Contract.SecType == "FUT") {
+            FutureReqeustedEvent.Invoke(reqId, contractDetails.ToFuture());
+        }
     }
 
     public override void managedAccounts (string accountsList) => Accounts = accountsList.Split(",");
 
     public override void nextValidId (int orderId) => ValidOrderId = orderId;
 
-    private void notifyObservers(int tickerId, Core.TickType tickType, double price) {
+    private void notifyObservers(int tickerId, Core.Types.TickType tickType, double price) {
         if (price == double.MaxValue) return;
         if (price <= 0.0) return;
         if (tickObservers.TryGetValue(tickerId, out var observers)) {
@@ -63,15 +67,15 @@ internal class IbWrapper (
         switch (field) {
             case IBApi.TickType.ASK:
             case IBApi.TickType.DELAYED_ASK:
-                notifyObservers(tickerId, Core.TickType.Ask, price);
+                notifyObservers(tickerId, Core.Types.TickType.Ask, price);
                 break;
             case IBApi.TickType.BID:
             case IBApi.TickType.DELAYED_BID:
-                notifyObservers(tickerId, Core.TickType.Bid, price);
+                notifyObservers(tickerId, Core.Types.TickType.Bid, price);
                 break;
             case IBApi.TickType.LAST:
             case IBApi.TickType.DELAYED_LAST:
-                notifyObservers(tickerId, Core.TickType.LastPrice, price);
+                notifyObservers(tickerId, Core.Types.TickType.LastPrice, price);
                 break;
             default:
                 break;

@@ -1,9 +1,10 @@
 ﻿using Connectors.IB;
+using Core.Commands.Base;
 using GreatOptionTrader.ViewModels;
 using System.Collections.ObjectModel;
 
 namespace GreatOptionTrader.Commands;
-public class StartAllContainerCommand (InteractiveBroker broker, ObservableCollection<OptionStrategyContainerViewModel> containers) : Base.Command {
+public class StartAllContainerCommand (InteractiveBroker broker, ObservableCollection<OptionStrategyContainerViewModel> containers) : Command {
     public override bool CanExecute (object? parameter) => broker.IsConnected();
     public override void Execute (object? parameter) {
         foreach( var container in containers) {

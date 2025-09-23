@@ -1,4 +1,5 @@
 ﻿using Connectors.IB;
+using Core.Types;
 using GreatOptionTrader.ViewModels;
 using System;
 using System.Windows;
@@ -24,7 +25,7 @@ public partial class OpenMasterPositionVIew : Window {
         OrderParams = new OrderParamsViewModel() {
             Price = container.LastPrice,
             Volume = 1,
-            Direction = Core.TradeDirection.Buy,
+            Direction = TradeDirection.Buy,
         };
         tbTargetPnL.SetBinding(
             TextBox.TextProperty,
