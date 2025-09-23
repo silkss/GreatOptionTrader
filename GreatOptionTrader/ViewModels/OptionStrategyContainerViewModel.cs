@@ -15,29 +15,24 @@ public class OptionStrategyContainerViewModel : BaseOptionStrategyViewModel {
     private readonly Dispatcher dispatcher;
     private Task? pnlUpdaterWorker;
 
-    private async Task makePnLUpdaterWorker() {
+    private async Task makePnLUpdaterWorker () {
         while (IsStarted) {
 
-            if (Container.State == Types.ContainerState.Created)
-            {
+            if (Container.State == Types.ContainerState.Created) {
                 UpdatePnL();
-                if (CurrencyOpenPnL >= ContainerSettings.CurrencyTargetPnL)
-                {
+                if (CurrencyOpenPnL >= ContainerSettings.CurrencyTargetPnL) {
                     Close(broker);
                 }
             }
-            else if (Container.State == Types.ContainerState.Closing)
-            {
+            else if (Container.State == Types.ContainerState.Closing) {
                 bool isClosed = false;
 
                 isClosed = Position.CurrentVolume == 0m;
-                foreach (var strategy in OptionStrategies)
-                {
+                foreach (var strategy in OptionStrategies) {
                     isClosed = isClosed && (strategy.Position.CurrentVolume == 0m);
                 }
 
-                if (isClosed)
-                {
+                if (isClosed) {
                     Container.State = Types.ContainerState.Closed;
                     IsStarted = false;
                     RaisePropertyChanged(nameof(IsStarted));
@@ -47,9 +42,9 @@ public class OptionStrategyContainerViewModel : BaseOptionStrategyViewModel {
         }
     }
 
-    private OptionStrategyViewModel createOptionStrategyViewModel(OptionStrategy strategy) {
+    private OptionStrategyViewModel createOptionStrategyViewModel (OptionStrategy strategy) {
         return new OptionStrategyViewModel(
-            strategy: strategy, 
+            strategy: strategy,
             broker: broker);
     }
 
@@ -64,6 +59,11 @@ public class OptionStrategyContainerViewModel : BaseOptionStrategyViewModel {
         UpdatePnL();
     }
 
+    private decimal currencyContainerTotalPnL;
+    public decimal CurrencyContainerTotalPnL {
+        get => currencyContainerTotalPnL;
+        set => Set(ref currencyContainerTotalPnL, value);
+    }
     public bool IsStarted { get; set; }
     public ContainerSettings ContainerSettings => Container.Settings;
     public override ICollection<Order> Orders => Container.Orders;
@@ -74,16 +74,15 @@ public class OptionStrategyContainerViewModel : BaseOptionStrategyViewModel {
 
     public override Option Instrument => Container.Instrument;
 
-    public bool CanStarted() => !IsStarted && Container.State != Types.ContainerState.Closed;
-    
+    public bool CanStarted () => !IsStarted && Container.State != Types.ContainerState.Closed;
+
     public void Start (InteractiveBroker broker) {
         if (IsStarted) return;
         if (Container.State == Types.ContainerState.Closed) return;
-        
+
         broker.SubscribeOnMarketData(this);
 
-        foreach (var optionStrategy in OptionStrategies)
-        {
+        foreach (var optionStrategy in OptionStrategies) {
             broker.SubscribeOnMarketData(optionStrategy);
         }
 
@@ -91,16 +90,15 @@ public class OptionStrategyContainerViewModel : BaseOptionStrategyViewModel {
         RaisePropertyChanged(nameof(IsStarted));
         pnlUpdaterWorker = makePnLUpdaterWorker();
     }
-    
-    public void AddStrategy(OptionStrategy strategy) {
+
+    public void AddStrategy (OptionStrategy strategy) {
         Container.Strategies.Add(strategy);
         var vm = createOptionStrategyViewModel(strategy);
 
-        if (IsStarted)
-        {
+        if (IsStarted) {
             broker.SubscribeOnMarketData(vm);
         }
-        
+
         dispatcher.Invoke(() => {
             OptionStrategies.Add(vm);
         });
@@ -118,14 +116,13 @@ public class OptionStrategyContainerViewModel : BaseOptionStrategyViewModel {
             strategy.RaisePropertyChange();
         }
 
-        CurrencyOpenPnL += hedgeOpenPnL;
-        CurrencyTotalPnL += hedgeTotalPnL;
+        CurrencyContainerTotalPnL = CurrencyTotalPnL + hedgeTotalPnL;
+
         RaisePropertyChange();
     }
-    
-    public void Close(InteractiveBroker broker) {
-        if (Container.State is Types.ContainerState.Closing or Types.ContainerState.Closed)
-        {
+
+    public void Close (InteractiveBroker broker) {
+        if (Container.State is Types.ContainerState.Closing or Types.ContainerState.Closed) {
             return;
         }
 

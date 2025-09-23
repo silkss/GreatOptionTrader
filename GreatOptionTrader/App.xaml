@@ -102,9 +102,16 @@
                                        Background="{Binding CurrencyTotalPnL, Converter={StaticResource PnLToBrushConv}}"
                                        TextAlignment="Right"
                                        FontWeight="SemiBold"/>
-                            <TextBlock Grid.Column="6" Text="{Binding ContainerSettings.CurrencyTargetPnL}"
-                                       TextAlignment="Right"
-                                       FontWeight="SemiBold"/>
+                            <UniformGrid Grid.Column="6" Rows="1" >
+                                <TextBlock Text="{Binding CurrencyContainerTotalPnL,StringFormat=0.00$}"
+                                           Background="{Binding CurrencyOpenPnL, Converter={StaticResource PnLToBrushConv}}"
+                                           ToolTip="ПиУ контенера."
+                                            TextAlignment="Right"
+                                            FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding ContainerSettings.CurrencyTargetPnL}"
+                                           TextAlignment="Right"
+                                           FontWeight="SemiBold"/>
+                            </UniformGrid>
                         </Grid>
                     </Expander.Header>
                     <Expander.Content>
