@@ -16,6 +16,7 @@
             </MenuItem>
             <MenuItem Header="containers">
                 <MenuItem Header="create" Command="{Binding CreateContainer}"/>
+                <MenuItem Header="save all" Command="{Binding SaveContainers}"/>
             </MenuItem>
         </Menu>
 
@@ -27,9 +28,19 @@
             <ListView DockPanel.Dock="Bottom" x:Name="lvContainers" ItemsSource="{Binding Containers}"/>
 
             <StackPanel Grid.Column="1">
-                <Button Content=">" Width="32" Height="32" Style="{StaticResource BaseButtonStyle}"
+                <Button Width="32" Height="32" Style="{StaticResource BaseButtonStyle}"
+                        Content="{StaticResource PlayIcon}"
+                        FontWeight="SemiBold"
                         Command="{Binding StartContainer}"
                         CommandParameter="{Binding ElementName=lvContainers,Path=SelectedItem}"/>
+                <Button Content="M" Width="32" Height="32" Style="{StaticResource BaseButtonStyle}"
+                        FontWeight="SemiBold"
+                        />
+                <Button Content="H" Width="32" Height="32" Style="{StaticResource BaseButtonStyle}"
+                        FontWeight="SemiBold"
+                        Command="{Binding EditHedgeCommand}"
+                        CommandParameter="{Binding ElementName=lvContainers, Path=SelectedItem}"
+                        />
             </StackPanel>
         </Grid>
 

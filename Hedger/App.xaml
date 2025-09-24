@@ -16,7 +16,7 @@
                         <ColumnDefinition/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0">
+                    <TextBlock Grid.Column="0" Style="{StaticResource BaseTextBlockStyle}">
                         <TextBlock.Text>
                             <MultiBinding StringFormat="{}{0}: {1}">
                                 <Binding Path="Instrument.Name"/>

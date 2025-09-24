@@ -29,17 +29,38 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*"/>
                     <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
                     <ColumnDefinition Width="42"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBox Grid.Column="0" Style="{StaticResource BaseTextBoxStyle}"
+                <TextBlock Text="Basis" Style="{StaticResource BaseTextBlockStyle}"/>
+                <TextBox Grid.Column="1" Style="{StaticResource BaseTextBoxStyle}"
                          Text="{Binding BasisName, Mode=OneWayToSource}"
                          ToolTip="полное имя тикера."/>
-                <TextBox Grid.Column="1" Style="{StaticResource BaseTextBoxStyle}"
+                <TextBox Grid.Column="2" Style="{StaticResource BaseTextBoxStyle}"
                          Text="{Binding BasisExchange, Mode=OneWayToSource}"
                          ToolTip="биржа тикера."/>
-                <Button Grid.Column="2" Width="32" Height="32" Content="+" Style="{StaticResource BaseButtonStyle}"
-                        Command="{Binding RequestFuture}"/>
+                <Button Grid.Column="3" Width="32" Height="32" Content="+" Style="{StaticResource BaseButtonStyle}"
+                        Command="{Binding RequestBasis}"/>
+            </Grid>
+
+            <Grid Height="{StaticResource StackPanelElementHeight}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="42"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="Hedge Basis:" Style="{StaticResource BaseTextBlockStyle}"/>
+                <TextBox Grid.Column="1" Style="{StaticResource BaseTextBoxStyle}"
+                         Text="{Binding BasisName, Mode=OneWayToSource}"
+                         ToolTip="полное имя тикера."/>
+                <TextBox Grid.Column="2" Style="{StaticResource BaseTextBoxStyle}"
+                         Text="{Binding BasisExchange, Mode=OneWayToSource}"
+                         ToolTip="биржа тикера."/>
+                <Button Grid.Column="3" Width="32" Height="32" Content="+" Style="{StaticResource BaseButtonStyle}"
+                        Command="{Binding RequestHedgeBasis}"/>
             </Grid>
 
             <Grid Height="{StaticResource StackPanelElementHeight}">
@@ -47,7 +68,25 @@
                     <ColumnDefinition Width="1*"/>
                     <ColumnDefinition Width="2*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="basis:" Style="{StaticResource BaseTextBlockStyle}"/>
+                <TextBlock Grid.Column="0" Text="Current basis:" Style="{StaticResource BaseTextBlockStyle}"/>
+                <TextBlock Grid.Column="1" Style="{StaticResource BaseTextBlockStyle}">
+                    <TextBlock.Text>
+                        <MultiBinding StringFormat="{}{0} {1} {2} {3}">
+                            <Binding Path="SelectedBasis.Name" />
+                            <Binding Path="SelectedBasis.Symbol" />
+                            <Binding Path="SelectedBasis.Exchange" />
+                            <Binding Path="SelectedBasis.DaysToExpiration"/>
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+            </Grid>
+            <Grid Height="{StaticResource StackPanelElementHeight}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Current hedge basis:" Style="{StaticResource BaseTextBlockStyle}"/>
+                <TextBlock Grid.Column="0" Text="Current hedge basis:" Style="{StaticResource BaseTextBlockStyle}"/>
                 <TextBlock Grid.Column="1" Style="{StaticResource BaseTextBlockStyle}">
                     <TextBlock.Text>
                         <MultiBinding StringFormat="{}{0} {1} {2} {3}">

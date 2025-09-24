@@ -4,27 +4,33 @@ using Core.Types;
 using Hedger.Models;
 
 namespace Hedger.ViewModels;
-public class ContainerViewModel : MarketDataObserver<Future> {
+public class HedgeContainerViewModel : MarketDataObserver<Future> {
     private readonly InteractiveBroker broker;
-    private readonly Container container;
 
-    private HedgeContainerViewModel createHedgeViewModel(HedgeContainer hedge) {
-        return new HedgeContainerViewModel(hedge, broker);
-    }
-
-    public ContainerViewModel(Container container, InteractiveBroker broker) {
-        this.container = container;
+    public HedgeContainerViewModel(HedgeContainer hedge, InteractiveBroker broker) {
+        Hedge = hedge;
         this.broker = broker;
-        Hedge = createHedgeViewModel(container.Hedge);
+    }
+    
+    private void tryBuy(decimal price) {
+        decimal tradeVolume = 0m;
+
+        foreach (var level in Hedge.BuyLevels) {
+            if (level.State == HedgeLevelState.Observe) {
+                if (price >= level.ActivatePrice) {
+                    tradeVolume += level.Volume;
+                }
+            }
+        }
     }
 
-    public decimal LastPrice { get; private set; }
+    public HedgeContainer Hedge { get; }
     public decimal AskPrice { get; private set; }
     public decimal BidPrice { get; private set; }
+    public decimal LastPrice { get; private set; }
 
-    public override Future Instrument => container.Basis;
-    public Container Container => container;
-    public HedgeContainerViewModel Hedge { get; }
+    public override Future Instrument => Hedge.Basis;
+
     public override void OnNext (TickEventArg arg) {
         switch (arg.TickType) {
             case TickType.Bid:
@@ -43,13 +49,9 @@ public class ContainerViewModel : MarketDataObserver<Future> {
                 if (LastPrice != arg.Price) {
                     LastPrice = arg.Price;
                     RaisePropertyChanged(nameof(LastPrice));
+                    trade();
                 }
                 break;
         }
-
-    }
-    public void Start() {
-        broker.SubscribeOnMarketData(this);
-        broker.SubscribeOnMarketData(Hedge);
     }
 }

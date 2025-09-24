@@ -6,6 +6,9 @@
         xmlns:local="clr-namespace:GreatOptionTrader"
         
         mc:Ignorable="d"
+        
+        Icon="/Icons/fish_iconjpg.ico"
+        
         Title="Greate Option Trader"
         Height="450" Width="900"
         MinHeight="450" MinWidth="900">
@@ -47,18 +50,11 @@
                     </Button>
 
                     <Button Width="32" Height="32"
-                        Style="{StaticResource BaseButtonStyle}"
-                        Command="{Binding StartContainerCommand}"
-                        ToolTip="Запустить выбранный контейнер"
-                        CommandParameter="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem}">
-                        <Button.Content>
-                            <Path Data="M 1, 1 L 15, 10 L 1,20 Z"
-                              Stroke="{Binding RelativeSource={RelativeSource AncestorType=Control}, Path=Foreground}" 
-                              Fill="{Binding RelativeSource={RelativeSource AncestorType=Control}, Path=Foreground}" 
-                              StrokeThickness="2"
-                              StrokeLineJoin="Round" />
-                        </Button.Content>
-                    </Button>
+                            Content="{StaticResource PlayIcon}"
+                            Style="{StaticResource BaseButtonStyle}"
+                            Command="{Binding StartContainerCommand}"
+                            ToolTip="Запустить выбранный контейнер"
+                            CommandParameter="{Binding ElementName=dgInstrumentGroups, Path=SelectedItem}"/>
 
                     <Button Width="32" Height="32" Content="M" Style="{StaticResource BaseButtonStyle}"
                         FontWeight="UltraBlack"

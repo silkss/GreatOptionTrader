@@ -31,6 +31,7 @@
     <Style TargetType="DataGrid">
         <Setter Property="Margin" Value="{StaticResource BaseMargin}"/>
         <Setter Property="HeadersVisibility" Value="Column"/>
+        <Setter Property="Background" Value="Transparent"/>
     </Style>
 
     <Style TargetType="ListViewItem">
@@ -52,4 +53,11 @@
         <Setter Property="VerticalContentAlignment" Value ="Center"/>
         <Setter Property="Margin" Value="{StaticResource BaseMargin}"/>
     </Style>
+
+    <Path x:Key="PlayIcon" Data="M 1, 1 L 15, 10 L 1,20 Z"
+          Stroke="{Binding RelativeSource={RelativeSource AncestorType=Control}, Path=Foreground}" 
+          Fill="{Binding RelativeSource={RelativeSource AncestorType=Control}, Path=Foreground}" 
+          StrokeThickness="2"
+          StrokeLineJoin="Round"/>
+    
 </ResourceDictionary>
