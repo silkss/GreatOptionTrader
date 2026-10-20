@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Core/Core.csproj" />
+  <Project Path="GreatOptionTrader/GreatOptionTrader.csproj" />
+  <Project Path="ibapi_1050_02/ibapi_1050_02.csproj" />
+</Solution>

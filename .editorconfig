@@ -1,0 +1,5 @@
+ini
+dotnet_diagnostic.IDE0055.severity = warning
+
+[.cs]
+csharp_new_line_before_open_brace = none
