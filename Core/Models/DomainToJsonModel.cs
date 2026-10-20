@@ -23,7 +23,7 @@ static class DomainToJsonModel {
     ) => new(
         Right: domain.Right.ToModel(),
         Type: domain.Type.ToModel(),
-        Id: domain.Type.Id,
+        Id: domain.Id,
         Name: domain.Name,
         Symbol: domain.Symbol,
         Exchange: domain.Exchange,

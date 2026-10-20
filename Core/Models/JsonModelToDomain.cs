@@ -6,7 +6,7 @@ static class JsonModelToDomain {
     ) => model switch {
         Json.InstrumentRightJsonModel.Put => Domain.InstrumentRight.Put,
         Json.InstrumentRightJsonModel.Call => Domain.InstrumentRight.Call,
-        Json.InstrumentRightJsonModel.None => Domain.InstrumentRight.None
+        Json.InstrumentRightJsonModel.None => Domain.InstrumentRight.None,
         _ => throw new System.Exception($"unsupported model: {typeof(Json.InstrumentRightJsonModel)}")
     };
 

@@ -1,21 +1,25 @@
-﻿using Core.Domain;
+﻿using Core.Loaders;
 using Core.Models;
-using Core.Models.Json;
 
 namespace Core.Repositories;
 
-internal class OptionStrategiesRepository : Base.JsonRepository<OptionStrategy, OptionSstrategyJsonModel> {
-    protected override OptionStrategy toDomain (
-        OptionSstrategyJsonModel model
+internal class OptionStrategiesRepository : Base.JsonRepository<Domain.OptionStrategy, Models.Json.OptionSstrategyJsonModel> {
+
+    public OptionStrategiesRepository (JsonLoader<Models.Json.OptionSstrategyJsonModel> loader) : base(loader) { }
+
+    protected override Domain.OptionStrategy toDomain (
+        Models.Json.OptionSstrategyJsonModel model
     ) => new(
-        instrument: model.Instrument.ToDomain(),
-        account: model.Account
+        id: model.Id,
+        account: model.Account,
+        instrument: model.Instrument.ToDomain()
     );
 
-    protected override OptionSstrategyJsonModel toModel (
-        OptionStrategy domain
+    protected override Models.Json.OptionSstrategyJsonModel toModel (
+        Domain.OptionStrategy domain
     ) => new(
-        Instrument: domain.Instrument.ToModel(),
-        Account: domain.Account
+        Id: domain.Id,
+        Account: domain.Account,
+        Instrument: domain.Instrument.ToModel()
     );
 }
